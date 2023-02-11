@@ -153,22 +153,10 @@ function GenericUtilityInternal.CreateAutofill()
     local autofillMT = {}
 end
 
-local GenericUtility = {}
-function GenericUtility:assign(utilName, utilFn)
-    GenericUtilityInternal[assert(utilName, 'Argument 1 cannot nil')] = utilFn
-end
-
-setmetatable(GenericUtility, {
-    __index = function(_,k)
-        if GenericUtilityInternal[k] then
-            return GenericUtilityInternal[k]
-        else
-            error("'" .. k .. "' does not exist.")
-        end
-    end,
+setmetatable(GenericUtilityInternal, {
     __newindex = function(_, k)
         error("Cannot assign property '" .. k .. "'.")
     end,
 })
 
-return GenericUtility
+return GenericUtilityInternal
