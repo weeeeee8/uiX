@@ -14,9 +14,14 @@ function Require:import(urlToImport: string, invokeFunctionOnImport, ...)
         urlToImport = url .. urlToImport
     end
 
+    if urlToImport:find("Require.lua") then
+        error("Cannot import script.")
+    end
+
     local _t = string.split(urlToImport, '/')
     local scope = _t[#_t]
-    local stored_import = self:get(scope)
+    local name = scope:gsub(".lua", '')
+    local stored_import = self:get(name)
     if stored_import then
         return stored_import
     end
@@ -27,7 +32,7 @@ function Require:import(urlToImport: string, invokeFunctionOnImport, ...)
         if (typeof(src) == "function") and invokeFunctionOnImport then
             src = src(...)
         end
-        cached_imports[scope:gsub(".lua", '')] = src
+        cached_imports[name] = src
         return src
     end
 end

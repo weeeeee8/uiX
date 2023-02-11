@@ -1,8 +1,37 @@
 local TypesMarshaller = UIX.Require:import("/lib/TypesMarshaller.lua")
+local Signal = UIX.Require:import("/modules/Signal.lua")
 
 local VECTOR_XZ = Vector3.new(1, 0, 1)
 
 local GenericUtilityInternal = {}
+
+GenericUtilityInternal.State = {} do
+    GenericUtilityInternal.State.__index = GenericUtilityInternal.State
+    function GenericUtilityInternal.State.new(initialValue)
+        local self = setmetatable({
+            IsState = true,
+            _v = initialValue,
+            _changed = Signal.new()
+        }, GenericUtilityInternal.State)
+        self._changed:Fire(self._v, nil)
+        return self
+    end
+
+    function GenericUtilityInternal.State:set(newValue, forceValue)
+        if (self._v ~= newValue) or forceValue then
+            self._changed:Fire(newValue, self._v)
+            self._v = newValue
+        end
+    end
+
+    function GenericUtilityInternal.State:get()
+        return self._v
+    end
+
+    function GenericUtilityInternal.State:onChanged(fn)
+        return self._changed:Connect(fn)
+    end
+end
 
 GenericUtilityInternal.Stack = {
     __tostring = function() return "StackObject" end,
@@ -106,6 +135,17 @@ function GenericUtilityInternal:Set(...)
         set[key] = true
     end
     return set
+end
+
+function GenericUtilityInternal:Symbol(name)
+	local symbol = newproxy(true)
+	if not name then
+		name = ""
+	end
+	getmetatable(symbol).__tostring = function()
+		return "Symbol(" .. name .. ")"
+	end
+	return symbol
 end
 
 local GenericUtility = {}
