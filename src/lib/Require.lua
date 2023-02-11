@@ -25,7 +25,7 @@ function Require:import(urlToImport: string, invokeFunctionOnImport, ...)
     local _t = string.split(urlToImport, '/')
     local scope = _t[#_t]
     local name = scope:gsub(".lua", '')
-    local stored_import = self:get(name)
+    local stored_import = cached_imports[name]
     if stored_import then
         return stored_import
     end
