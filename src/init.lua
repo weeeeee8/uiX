@@ -1,7 +1,7 @@
 local FILE_PATHS = {
     folder = 'uix',
     plugins_folder = 'uix/plugins',
-    saves_folder = 'uix/saves'
+    saves_folder = 'uix/saves',
 }
 
 local env = assert(getgenv, 'Cannot find "getgenv" global, could it be exploit is not supported?')()
@@ -14,8 +14,12 @@ end
 
 local function reconcilefile(path)
     if not isfile(path) then
-        writefile(path)
+        writefile(path, "")
+
+        return true
     end
+
+    return false
 end
 
 reconcilefolder(FILE_PATHS.folder)
@@ -29,15 +33,20 @@ end
 env.__GLOBAL__ = env
 env.UIX = {
     __internal = {
+        FilePaths = FILE_PATHS,
         Clean = function(self)
             env.UIX.Require:clearCache()
+            env.UIX.Maid:Destroy()
         end,
     },
     Require = loadstring(game:HttpGet(string.format(
         'https://raw.githubusercontent.com/%s/uiX/%s/src/lib/Require.lua',
         'weeeeee8',
         'main'
-    ))),
+    )))(),
     reconcilefile = reconcilefile,
     reconcilefolder = reconcilefolder
 }
+env.UIX.Maid = env.UIX.Require:import("/modules/Maid.lua")
+
+return env.UIX

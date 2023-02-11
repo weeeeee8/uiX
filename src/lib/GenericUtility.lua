@@ -148,6 +148,11 @@ function GenericUtilityInternal:Symbol(name)
 	return symbol
 end
 
+function GenericUtilityInternal.CreateAutofill()
+    local autofill = {}
+    local autofillMT = {}
+end
+
 local GenericUtility = {}
 function GenericUtility:assign(utilName, utilFn)
     GenericUtilityInternal[assert(utilName, 'Argument 1 cannot nil')] = utilFn
