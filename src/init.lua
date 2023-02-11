@@ -4,6 +4,8 @@ local FILE_PATHS = {
     saves_folder = 'uix/saves'
 }
 
+local env = assert(getgenv, 'Cannot find "getgenv" global, could it be exploit is not supported?')()
+
 local function reconcilefolder(path)
     if not isfolder(path) then
         makefolder(path)
@@ -20,18 +22,13 @@ reconcilefolder(FILE_PATHS.folder)
 reconcilefolder(FILE_PATHS.plugins_folder)
 reconcilefolder(FILE_PATHS.saves_folder)
 
-if not __GLOBAL__ then
-    local env = assert(getgenv, 'Cannot find "getgenv" global, could it be exploit is not supported?')()
-    env.__GLOBAL__ = env
-
-    env.reconcilefolder = reconcilefolder
-    env.reconcilefile = reconcilefile
-
-    env.UIX = {
-        Require = loadstring(game:HttpGet(string.format(
-            '',
-            'weeeeee8',
-            'main'
-        )))
-    }
-end
+env.__GLOBAL__ = env
+env.UIX = {
+    Require = loadstring(game:HttpGet(string.format(
+        'https://raw.githubusercontent.com/%s/uiX/%s/src/lib/Require.lua',
+        'weeeeee8',
+        'main'
+    ))),
+    reconcilefile = reconcilefile,
+    reconcilefolder = reconcilefolder
+}

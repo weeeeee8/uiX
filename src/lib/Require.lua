@@ -1,18 +1,22 @@
 local cached_imports = {}
 
 local url = string.format(
-    '',
+    'https://raw.githubusercontent.com/%s/uiX/%s/src',
     'weeeeee8',
     'main'
 )
 
 local Require = {}
 function Require:import(urlToImport: string, invokeFunctionOnImport, ...)
-    if url:sub(1, #urlToImport):lower() ~= urlToImport:lower() then
-        warn('Importing unidentified module off the web.')
-    elseif not url:find('https://', 1) then
+    if not urlToImport:find('https://', 1) then
+        if urlToImport:sub(-1, 1) ~= '/' then
+            urlToImport = '/' .. urlToImport
+        end
         urlToImport = url .. urlToImport
+    elseif url:find('https://', 1) and url:sub(1, #urlToImport):lower() ~= urlToImport:lower() then
+        warn('Importing unidentified module off the web.')
     end
+
 
     if urlToImport:find("Require.lua") then
         error("Cannot import script.")
