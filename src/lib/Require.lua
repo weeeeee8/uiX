@@ -45,6 +45,10 @@ function Require:get(name)
     return assert(cached_imports[name], "Library/Module '" .. name .. "' cannot be found.")
 end
 
+function Require:clearCache()
+    table.clear(cached_imports)
+end
+
 setmetatable(Require, {
     __index = function(_,k)
         error("'" .. k .. "' does not exist.")
