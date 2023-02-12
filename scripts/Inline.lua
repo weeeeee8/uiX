@@ -3,6 +3,7 @@ local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
+warn("[Inline] Importing modules!")
 local UIX = loadstring(game:HttpGet(string.format(
     'https://raw.githubusercontent.com/%s/uiX/%s/src/init.lua',
     'weeeeee8',
@@ -12,6 +13,7 @@ local UIX = loadstring(game:HttpGet(string.format(
 local Fusion = UIX.Require:import('/modules/fusion/Fusion.lua')
 local GenericUtility = UIX.Require:import('/lib/GenericUtility.lua')
 local Signal = UIX.Require:import('/modules/Signal.lua')
+warn("[Inline] Modules imported!")
 
 local CONFIGURATION_PATH = UIX.__internal.FilePaths.saves_folder..'/inlineConfig.json'
 local PLUGINS_PATH = UIX.__internal.FilePaths.plugins_folder..'/Inline'
