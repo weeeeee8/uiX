@@ -164,6 +164,7 @@ local Window = Fusion.New "ScreenGui" {
     ResetOnSpawn = false,
     IgnoreGuiInset = true,
     Enabled = true,
+    Parent = if gethui then gethui() else game:GetService("CoreGui"),
 
     [Fusion.Children] = {
         Fusion.New "Frame" {
@@ -269,7 +270,6 @@ local Window = Fusion.New "ScreenGui" {
         }
     }
 }
-Window.Parent = if gethui then gethui() else game:GetService("CoreGui")
 
 local DraggableObject = Utility.Draggable()
 DraggableObject:setPositionState(States.windowPosition):setHostObject(Window.Body):start()
