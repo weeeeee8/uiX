@@ -32,7 +32,7 @@ function Require:import(urlToImport: string, invokeFunctionOnImport, ...)
 
     local success, chunk = pcall(game.HttpGet, game, urlToImport)
     if success then
-        local src = loadstring(chunk, scope)
+        local src = loadstring(chunk, scope)()
         if (typeof(src) == "function") and invokeFunctionOnImport then
             src = src(...)
         end
