@@ -13,7 +13,7 @@ local Fusion = UIX.Require:import('/modules/fusion/Fusion.lua')
 local GenericUtility = UIX.Require:import('/lib/GenericUtility.lua')
 local Signal = UIX.Require:import('/modules/Signal.lua')
 
-local CONFIGURATION_PATH = UIX.__internal.FilePaths.saves_folder..'/inlineConfig.lua'
+local CONFIGURATION_PATH = UIX.__internal.FilePaths.saves_folder..'/inlineConfig.json'
 local PLUGINS_PATH = UIX.__internal.FilePaths.plugins_folder..'/Inline'
 local TEXT_SIZE_Y = 15
 local MAXIMUM_LOGGED_MESSAGES = 100
