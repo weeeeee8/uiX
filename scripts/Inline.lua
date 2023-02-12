@@ -126,7 +126,7 @@ local Utility = {} do
                         self.originDragPosition = if self.hostObject then self.hostObject.Position else UDim2.fromScale(0.5, 0.5)
                     end
                     return Enum.ContextActionResult.Pass
-                end)
+                end, false, Enum.UserInputType.MouseButton1)
 
                 self.update = RunService.RenderStepped:Connect(function(deltaTime)
                     if self.hostObject then
@@ -169,6 +169,7 @@ local Window = Fusion.New "ScreenGui" {
     DisplayOrder = 50,
     ResetOnSpawn = false,
     IgnoreGuiInset = true,
+    Enabled = true,
 
     [Fusion.Children] = {
         Fusion.New "Frame" {
