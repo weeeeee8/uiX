@@ -166,7 +166,6 @@ end
 
 local Window = Fusion.New "ScreenGui" {
     Name = "InlineInterface",
-    Parent = if gethui then gethui() else game:GetService("CoreGui"),
     DisplayOrder = 50,
     ResetOnSpawn = false,
     IgnoreGuiInset = true,
@@ -275,6 +274,7 @@ local Window = Fusion.New "ScreenGui" {
         }
     }
 }
+Window.Parent = if gethui then gethui() else game:GetService("CoreGui")
 
 local DraggableObject = Utility.Draggable()
 DraggableObject:setPositionState(States.windowPosition):setHostObject(Window.Body):start()
