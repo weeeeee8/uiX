@@ -22,16 +22,10 @@ local ERROR_LOG_MARKER = GenericUtility:Symbol("ErrorLog")
 local WARNING_LOG_MARKER = GenericUtility:Symbol("WarningLog")
 local INFO_LOG_MARKER = GenericUtility:Symbol("InfoLog")
 
-UIX.reconcilefolder(PLUGINS_PATH)
-local fileExistnt = UIX.reconcilefile(CONFIGURATION_PATH)
-
 local Plugins = {}
 
 local Events = {
     logOutput = Signal.new()
-}
-local Configuration = {
-    Key = "Backquote",
 }
 local States = {
     windowShown = Fusion.State(false),
@@ -280,12 +274,15 @@ Window.Parent = if gethui then gethui() else game:GetService("CoreGui")
 local DraggableObject = Utility.Draggable()
 DraggableObject:setPositionState(States.windowPosition):setHostObject(Window.Body):start()
 
+local function focusCommandInput()
+    local textbox = Window.Body.InputContainer.Frame.TextBox :: TextBox
+end
+
 UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
     if gpe then return end
-    if inputObject.UserInputType == Enum.KeyCode[Configuration.Key] then
+    if inputObject.UserInputType == Enum.KeyCode.Backquote then
         States.windowShown:set(not States.windowShown:get())
     end
-    
 end))
 
 UIX.Maid:GiveTask(Events.logOutput:Connect(function(logContext)
@@ -311,11 +308,4 @@ UIX.Maid:GiveTask(function() -- cleaning
     DraggableObject:stop()
 end)
 
-if fileExistnt then
-    writefile(CONFIGURATION_PATH, HttpService:JSONEncode(Configuration))
-else
-    local success, content = pcall(readfile, CONFIGURATION_PATH)
-    if success then
-        Configuration = HttpService:JSONDecode(content)
-    end
-end
+UIX.reconcilefolder(PLUGINS_PATH)

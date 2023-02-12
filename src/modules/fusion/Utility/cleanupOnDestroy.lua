@@ -18,7 +18,7 @@
 
 local RunService = game:GetService("RunService")
 
-local Types = UIX.Require:import(__FUSION_SRC_PATH__('/Utility/cleanup.lua'))
+local cleanup = UIX.Require:import(__FUSION_SRC_PATH__('/Utility/cleanup.lua'))
 
 type TaskData = {
 	connection: RBXScriptConnection,
