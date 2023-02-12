@@ -128,22 +128,15 @@ local Utility = {} do
                 table.insert(self.connections, self.hostObject.InputEnded:Connect(function()
                     self.dragging = false
                 end))
-
-                table.insert(self.connections, RunService.RenderStepped:Connect(function(deltaTime)
-                    if self.hostObject then
-                        local ap, as = self.hostObject.AbsolutePosition, self.hostObject.AbsoluteSize
-                        local tl, br = ap, ap + as
+                table.insert(self.connections, self.hostObject.MouseMoved:Connect(function()
+                    if self.dragging and self.hostObject.Visible then
                         local mouseloc = UserInputService:GetMouseLocation()
-
-                        self.canDrag = (mouseloc.X > tl.X and mouseloc.X < br.X) and (mouseloc.Y > br.Y and mouseloc.Y < tl.Y)
-                        if self.canDrag and self.dragging and self.hostObject.Visible then
-                            self.positionState:set(self.hostObject.Position:Lerp(UDim2.new(
-                                self.hostObject.Position.X.Scale,
-                                (self.originDragPosition.X.Offset - mouseloc.X),
-                                self.hostObject.Position.Y.Scale,
-                                (self.originDragPosition.Y.Offset - mouseloc.Y)
-                            ), math.min(deltaTime * 60, 1) * self.smoothingSpeed))
-                        end
+                        self.positionState:set(UDim2.new(
+                            self.hostObject.Position.X.Scale,
+                            (self.originDragPosition.X.Offset - mouseloc.X),
+                            self.hostObject.Position.Y.Scale,
+                            (self.originDragPosition.Y.Offset - mouseloc.Y)
+                        ))
                     end
                 end))
             end
@@ -154,11 +147,11 @@ local Utility = {} do
         function draggable:stop()
             self.started = false
 
-            ContextActionService:UnbindAction("Draggable <" .. self.id .. ">")
-            if self.update then
-                self.update:Disconnect()
-                self.update = nil
+            for _, c in ipairs(self.connections) do
+                c:Disconnect()
             end
+            table.clear(self.connections)
+            table.clear(self)
         end
 
         return draggable
@@ -189,7 +182,6 @@ local Window = Fusion.New "ScreenGui" {
             Position = Fusion.Computed(function()
                 return States.windowPosition:get()
             end),
-
             Visible = Fusion.Computed(function()
                 return States.windowShown:get()
             end),
@@ -286,11 +278,8 @@ local Window = Fusion.New "ScreenGui" {
 
                                     TextYAlignment = Enum.TextYAlignment.Center,
                                     TextXAlignment = Enum.TextXAlignment.Left,
-
-                                    [Fusion.Children] = {
-                                        FusionComponents.UICorner(5),
-                                    }
-                                }
+                                },
+                                FusionComponents.UICorner(5),
                             }
                         }
                     }
