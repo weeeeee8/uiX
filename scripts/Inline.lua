@@ -38,6 +38,12 @@ local FusionComponents = {} do
         return DateTime.now():FormatLocalTime("LTS", "en-us")
     end
 
+    function FusionComponents.UICorner(radius)
+        return Fusion.New "UICorner" {
+            CornerRadius = radius,
+        }
+    end
+
     function FusionComponents.UIPadding(left, right, top, bottom)
         return Fusion.New "UIPadding" {
             PaddingLeft = UDim.new(0, left or 0),
@@ -81,6 +87,7 @@ local FusionComponents = {} do
 
                     Size = UDim2.new(1, 0, 0, 0),
                     BackgroundTransparency = 1,
+                    ZIndex = 3,
                 },
                 FusionComponents.UIPadding(3, 3, 3, 3),
             }
@@ -161,11 +168,14 @@ end
 
 local Window = Fusion.New "ScreenGui" {
     Name = "InlineInterface",
+    Parent = if gethui then gethui() else game:GetService("CoreGui"),
+
+    ZIndexBehavior = Enum.ZIndexBehavior.Global,
     DisplayOrder = 50,
+
     ResetOnSpawn = false,
     IgnoreGuiInset = true,
     Enabled = true,
-    Parent = if gethui then gethui() else game:GetService("CoreGui"),
 
     [Fusion.Children] = {
         Fusion.New "Frame" {
@@ -175,7 +185,7 @@ local Window = Fusion.New "ScreenGui" {
             BackgroundTransparency = 0,
             BackgroundColor3 = Color3.fromRGB(27, 27, 27),
 
-            Size = UDim2.fromOffset(400, 300),
+            Size = UDim2.fromOffset(125, 300),
             AnchorPoint = Vector2.new(0.5, 0.5),
             Position = Fusion.Computed(function()
                 return States.windowPosition:get()
@@ -232,7 +242,9 @@ local Window = Fusion.New "ScreenGui" {
                     
                     [Fusion.Children] = {
                         Fusion.New "Frame" {
+                            ZIndex = 2,
                             BorderSizePixel = 0,
+
                             Size = UDim2.fromScale(1, 1),
                             Position = UDim2.fromScale(0.5, 0.5),
                             AnchorPoint = Vector2.new(0.5, 0.5),
@@ -240,8 +252,22 @@ local Window = Fusion.New "ScreenGui" {
                             BackgroundColor3 = Color3.fromRGB(12, 12, 12),
 
                             [Fusion.Children] = {
+                                Fusion.New "Frame" {
+                                    Name = "Fill",
+
+                                    Size = UDim2.fromScale(1, 0.5),
+                                    Position = UDim2.fromScale(0.5, 0),
+                                    AnchorPoint = Vector2.new(0.5, 0),
+                                    
+                                    BorderSizePixel = 0,
+                                    ZIndex = 2,
+
+                                    BackgroundColor3 = Color3.fromRGB(12, 12, 12),
+                                },
+                                FusionComponents.UIPadding(2, 2, 2, 2),
                                 Fusion.New "TextBox" {
                                     BackgroundTransparency = 1,
+                                    ZIndex = 3,
 
                                     Size = UDim2.fromScale(1, 1),
                                     Position = UDim2.fromScale(0.5, 0.5),
@@ -261,13 +287,17 @@ local Window = Fusion.New "ScreenGui" {
 
                                     TextYAlignment = Enum.TextYAlignment.Center,
                                     TextXAlignment = Enum.TextXAlignment.Left,
+
+                                    [Fusion.Children] = {
+                                        FusionComponents.UICorner(5),
+                                    }
                                 }
                             }
                         }
                     }
                 },
-
-                FusionComponents.UIPadding(5, 5, 5, 5)
+                FusionComponents.UIPadding(3, 3, 3, 3),
+                FusionComponents.UICorner(5),
             }
         }
     }
@@ -282,7 +312,7 @@ end
 
 UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
     if gpe then return end
-    if inputObject.UserInputType == Enum.KeyCode.RightAlt then
+    if inputObject.UserInputType == Enum.KeyCode.P then
         States.windowShown:set(not States.windowShown:get())
     end
 end))
