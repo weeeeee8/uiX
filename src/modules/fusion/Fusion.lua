@@ -1,5 +1,5 @@
 __GLOBAL__.__FUSION_SRC_PATH__ = function(path)
-    return '/packages/fusion' .. path
+    return '/modules/fusion' .. path
 end
 
 local Types = UIX.Require:import(__FUSION_SRC_PATH__('/Types.lua'))
