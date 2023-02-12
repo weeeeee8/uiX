@@ -29,7 +29,7 @@ local Events = {
     logOutput = Signal.new()
 }
 local States = {
-    windowShown = Fusion.State(true),
+    windowShown = Fusion.State(false),
     windowPosition = Fusion.State(UDim2.fromScale(0.5, 0.5)),
     logHistoryChildren = Fusion.State({})
 }
@@ -129,6 +129,7 @@ local Utility = {} do
                     self.dragging = false
                 end))
                 table.insert(self.connections, self.hostObject.MouseMoved:Connect(function()
+                    print(1)
                     if self.dragging and self.hostObject.Visible then
                         local mouseloc = UserInputService:GetMouseLocation()
                         self.positionState:set(UDim2.new(
