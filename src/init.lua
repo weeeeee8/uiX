@@ -47,6 +47,8 @@ env.UIX = {
     reconcilefile = reconcilefile,
     reconcilefolder = reconcilefolder
 }
-env.UIX.Maid = env.UIX.Require:import("/modules/Maid.lua")
+
+local Maid = env.UIX.Require:import("/modules/Maid.lua")
+env.UIX.Maid = Maid.new()
 
 return env.UIX
