@@ -100,11 +100,11 @@ local Utility = {} do
         local draggable = {}
         draggable.dragging = false
         draggable.canDrag = false
-        draggable.update = nil
         draggable.hostObject = nil
         draggable.positionState = nil
         draggable.id = HttpService:GenerateGUID(false)
         draggable.originDragPosition = nil
+        draggable.connections = {}
 
         draggable.smoothingSpeed = 1
 
@@ -122,15 +122,14 @@ local Utility = {} do
             if not self.started then
                 self.started = true
 
-                ContextActionService:BindAction("Draggable <" .. self.id .. ">", function(_, s, _)
-                    if self.canDrag then
-                        self.dragging = (s == Enum.UserInputState.Begin)
-                        self.originDragPosition = if self.hostObject then self.hostObject.Position else UDim2.fromScale(0.5, 0.5)
-                    end
-                    return Enum.ContextActionResult.Pass
-                end, false, Enum.UserInputType.MouseButton1)
+                table.insert(self.connections, self.hostObject.InputBegan:Connect(function()
+                    self.dragging = true
+                end))
+                table.insert(self.connections, self.hostObject.InputEnded:Connect(function()
+                    self.dragging = false
+                end))
 
-                self.update = RunService.RenderStepped:Connect(function(deltaTime)
+                table.insert(self.connections, RunService.RenderStepped:Connect(function(deltaTime)
                     if self.hostObject then
                         local ap, as = self.hostObject.AbsolutePosition, self.hostObject.AbsoluteSize
                         local tl, br = ap, ap + as
@@ -146,7 +145,7 @@ local Utility = {} do
                             ), math.min(deltaTime * 60, 1) * self.smoothingSpeed))
                         end
                     end
-                end)
+                end))
             end
 
             return self
@@ -185,7 +184,7 @@ local Window = Fusion.New "ScreenGui" {
             BackgroundTransparency = 0,
             BackgroundColor3 = Color3.fromRGB(27, 27, 27),
 
-            Size = UDim2.fromOffset(125, 300),
+            Size = UDim2.fromOffset(500, 200),
             AnchorPoint = Vector2.new(0.5, 0.5),
             Position = Fusion.Computed(function()
                 return States.windowPosition:get()
