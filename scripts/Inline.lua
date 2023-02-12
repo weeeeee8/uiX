@@ -273,6 +273,8 @@ local Window = Fusion.New "ScreenGui" {
     }
 }
 
+print(Window.Parent)
+
 local DraggableObject = Utility.Draggable()
 DraggableObject:setPositionState(States.windowPosition):setHostObject(Window.Body):start()
 
