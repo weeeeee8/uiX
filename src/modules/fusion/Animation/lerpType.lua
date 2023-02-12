@@ -5,7 +5,7 @@
 ]]
 
 local Types = UIX.Require:import(__FUSION_SRC_PATH__('/Types.lua'))
-local Oklab = UIX.Require:iImport(__FUSION_SRC_PATH__('/Colours/Oklab.lua'))
+local Oklab = UIX.Require:import(__FUSION_SRC_PATH__('/Colours/Oklab.lua'))
 
 local function lerpType(from: Types.Animatable | any, to: Types.Animatable | any, ratio: number): Types.Animatable | any
 	local typeString = typeof(from)

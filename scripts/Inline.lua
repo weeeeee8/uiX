@@ -25,6 +25,7 @@ local INFO_LOG_MARKER = GenericUtility:Symbol("InfoLog")
 UIX.reconcilefolder(PLUGINS_PATH)
 local fileExistnt = UIX.reconcilefile(CONFIGURATION_PATH)
 
+local Plugins = {}
 
 local Events = {
     logOutput = Signal.new()
