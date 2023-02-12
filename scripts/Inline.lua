@@ -195,7 +195,7 @@ local Window = Fusion.New "ScreenGui" {
 
                     Size = UDim2.fromScale(1, 0.875),
                     Position = UDim2.fromScale(0.5, 0),
-                    AnchorPoint = Vector3.new(0.5, 0),
+                    AnchorPoint = Vector2.new(0.5, 0),
 
                     [Fusion.Children] = {
                         Fusion.New "ScrollingFrame" {
@@ -231,7 +231,7 @@ local Window = Fusion.New "ScreenGui" {
 
                     Size = UDim2.fromScale(1, 0.125),
                     Position = UDim2.fromScale(0.5, 1),
-                    AnchorPoint = Vector3.new(0.5, 1),
+                    AnchorPoint = Vector2.new(0.5, 1),
                     
                     [Fusion.Children] = {
                         Fusion.New "Frame" {
