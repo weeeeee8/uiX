@@ -66,21 +66,30 @@ GenericUtilityInternal.Stack = {
     end
 end
 
-GenericUtilityInternal.TableUtil = {}
-function GenericUtilityInternal.TableUtil.QuickSort(target, discriminant, direction)
-    assert(direction == "ascending" or direction == "descending", "Unable to cast token 'direction'")
-    assert(target, "Argument 1 cannot be nil")
-    assert(discriminant, 'Argument 2 cannot be nil')
-    assert(type(discriminant) == "string", 'Argument 2 must be a string')
-    table.sort(target, function(a, b)
-        if direction == "ascending" then
-            return a[discriminant] < b[discriminant]
-        elseif direction == "descending" then
-            return a[discriminant] > b[discriminant]
-        else
-            error("Invalid sorting direction.")
+GenericUtilityInternal.TableUtil = {} do
+    function GenericUtilityInternal.TableUtil.QuickSort(target, discriminant, direction)
+        assert(direction == "ascending" or direction == "descending", "Unable to cast token 'direction'")
+        assert(target, "Argument 1 cannot be nil")
+        assert(discriminant, 'Argument 2 cannot be nil')
+        assert(type(discriminant) == "string", 'Argument 2 must be a string')
+        table.sort(target, function(a, b)
+            if direction == "ascending" then
+                return a[discriminant] < b[discriminant]
+            elseif direction == "descending" then
+                return a[discriminant] > b[discriminant]
+            else
+                error("Invalid sorting direction.")
+            end
+        end)
+    end
+
+    function GenericUtilityInternal.TableUtil.LenDict(src)
+        local n = 1
+        for _ in pairs(src) do
+            n+=1
         end
-    end)
+        return n
+    end
 end
 
 GenericUtilityInternal.Neighbors = {

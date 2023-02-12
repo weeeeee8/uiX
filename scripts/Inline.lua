@@ -11,6 +11,7 @@ local UIX = loadstring(game:HttpGet(string.format(
 
 local Fusion = UIX.Require:import('/modules/fusion/Fusion.lua')
 local GenericUtility = UIX.Require:import('/lib/GenericUtility.lua')
+local Signal = UIX.Require:import('/modules/Signal.lua')
 
 local CONFIGURATION_PATH = UIX.__internal.FilePaths.saves_folder..'/inlineConfig.lua'
 local PLUGINS_PATH = UIX.__internal.FilePaths.plugins_folder..'/Inline'
@@ -24,6 +25,10 @@ local INFO_LOG_MARKER = GenericUtility:Symbol("InfoLog")
 UIX.reconcilefolder(PLUGINS_PATH)
 local fileExistnt = UIX.reconcilefile(CONFIGURATION_PATH)
 
+
+local Events = {
+    logOutput = Signal.new()
+}
 local Configuration = {
     Key = "Backquote",
 }
@@ -91,6 +96,7 @@ local Utility = {} do
     function Utility.Draggable()
         local draggable = {}
         draggable.dragging = false
+        draggable.canDrag = false
         draggable.update = nil
         draggable.hostObject = nil
         draggable.positionState = nil
@@ -114,8 +120,11 @@ local Utility = {} do
                 self.started = true
 
                 ContextActionService:BindAction("Draggable <" .. self.id .. ">", function(_, s, _)
-                    self.dragging = (s == Enum.UserInputState.Begin)
-                    self.originDragPosition = if self.hostObject then self.hostObject.Position else UDim2.fromScale(0.5, 0.5)
+                    if self.canDrag then
+                        self.dragging = (s == Enum.UserInputState.Begin)
+                        self.originDragPosition = if self.hostObject then self.hostObject.Position else UDim2.fromScale(0.5, 0.5)
+                    end
+                    return Enum.ContextActionResult.Pass
                 end)
 
                 self.update = RunService.RenderStepped:Connect(function(deltaTime)
@@ -124,13 +133,14 @@ local Utility = {} do
                         local tl, br = ap, ap + as
                         local mouseloc = UserInputService:GetMouseLocation()
 
-                        if (mouseloc.X > tl.X and mouseloc.X < br.X) and (mouseloc.Y > br.Y and mouseloc.Y < tl.Y) and self.dragging then
+                        self.canDrag = (mouseloc.X > tl.X and mouseloc.X < br.X) and (mouseloc.Y > br.Y and mouseloc.Y < tl.Y)
+                        if self.canDrag and self.dragging then
                             self.positionState:set(self.hostObject.Position:Lerp(UDim2.new(
                                 self.hostObject.Position.X.Scale,
                                 (self.originDragPosition.X.Offset - mouseloc.X),
                                 self.hostObject.Position.Y.Scale,
                                 (self.originDragPosition.Y.Offset - mouseloc.Y)
-                            ), self.smoothingSpeed))
+                            ), math.min(deltaTime * 60, 1) * self.smoothingSpeed))
                         end
                     end
                 end)
@@ -143,7 +153,6 @@ local Utility = {} do
             self.started = false
 
             ContextActionService:UnbindAction("Draggable <" .. self.id .. ">")
-
             if self.update then
                 self.update:Disconnect()
                 self.update = nil
@@ -194,12 +203,22 @@ local Window = Fusion.New "ScreenGui" {
                             ScrollBarThickness = 2,
                             ScrollBarImageColor3 = Color3.fromRGB(235, 235, 235),
                         
-                            [Fusion.Children] = Fusion.ComputedPairs(States.logHistoryChildren, function(logData)
-                                return FusionComponents.Message {
-                                    ContextText = logData.text,
-                                    LogType = logData.type,
-                                }
-                            end)
+                            [Fusion.Children] = {
+                                Fusion.New "UIListLayout" {
+                                    Padding = UDim.new(0, 2),
+                                    FillDirection = Enum.FillDirection.Vertical,
+                                    VerticalAlignment = Enum.VerticalAlignment.Top,
+                                    HorizontalAlignment = Enum.HorizontalAlignment.Left,
+                                    SortOrder = Enum.SortOrder.LayoutOrder,
+                                },
+                                
+                                Fusion.ComputedPairs(States.logHistoryChildren, function(logData)
+                                    return FusionComponents.Message {
+                                        ContextText = logData.text,
+                                        LogType = logData.type,
+                                    }
+                                end)
+                            }
                         },
                         FusionComponents.UIPadding(2, 2, 2, 2)
                     }
@@ -256,14 +275,39 @@ local Window = Fusion.New "ScreenGui" {
     }
 }
 
-Utility.Draggable():setPositionState(States.windowPosition):setHostObject(Window.Body):start()
+local DraggableObject = Utility.Draggable()
+DraggableObject:setPositionState(States.windowPosition):setHostObject(Window.Body):start()
 
 UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
     if gpe then return end
     if inputObject.UserInputType == Enum.KeyCode[Configuration.Key] then
         States.windowShown:set(not States.windowShown:get())
     end
+    
 end))
+
+UIX.Maid:GiveTask(Events.logOutput:Connect(function(logContext)
+    local newLogSet = States.logHistoryChildren:get()
+    if #newLogSet > MAXIMUM_LOGGED_MESSAGES then
+        newLogSet[#newLogSet] = nil
+
+        local refreshedSet = {}
+        for i = 2, #newLogSet+1, 1 do
+            refreshedSet[i] = newLogSet[i-1]
+        end
+        newLogSet = refreshedSet
+    end
+    newLogSet[1] = logContext
+    States.logHistoryChildren:set(newLogSet)
+end))
+
+UIX.Maid:GiveTask(function() -- cleaning
+    for _, signal in pairs(Events) do
+        signal:Destroy()
+    end
+    Window:Destroy()
+    DraggableObject:stop()
+end)
 
 if fileExistnt then
     writefile(CONFIGURATION_PATH, HttpService:JSONEncode(Configuration))
