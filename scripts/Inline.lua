@@ -256,7 +256,7 @@ local Window = Fusion.New "ScreenGui" {
                                     PlaceholdeColor3 = Color3.fromRGB(117, 117, 117),
 
                                     RichText = true,
-                                    Multiline = false,
+                                    MultiLine = false,
                                     ClearTextOnFocus = false,
                                     
                                     TextSize = TEXT_SIZE_Y,
