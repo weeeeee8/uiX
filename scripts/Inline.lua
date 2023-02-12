@@ -40,7 +40,7 @@ local FusionComponents = {} do
 
     function FusionComponents.UICorner(radius)
         return Fusion.New "UICorner" {
-            CornerRadius = radius,
+            CornerRadius = UDim.new(0, radius),
         }
     end
 
