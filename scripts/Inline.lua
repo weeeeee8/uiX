@@ -253,7 +253,7 @@ local Window = Fusion.New "ScreenGui" {
                                     TextColor3 = Color3.fromRGB(235, 235, 235),
 
                                     PlaceholderText = "input command here",
-                                    PlaceholdeColor3 = Color3.fromRGB(117, 117, 117),
+                                    PlaceholderColor3 = Color3.fromRGB(117, 117, 117),
 
                                     RichText = true,
                                     MultiLine = false,
