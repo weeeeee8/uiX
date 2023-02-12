@@ -166,7 +166,7 @@ end
 
 local Window = Fusion.New "ScreenGui" {
     Name = "InlineInterface",
-    Parent = if gethui then gethui else game:GetService("CoreGui"),
+    Parent = if gethui then gethui() else game:GetService("CoreGui"),
     DisplayOrder = 50,
     ResetOnSpawn = false,
     IgnoreGuiInset = true,
