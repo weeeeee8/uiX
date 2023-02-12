@@ -167,6 +167,11 @@ function Signal:Once(fn)
 	return cn
 end
 
+function Signal:Destroy()
+	self:DisconnectAll()
+	setmetatable(self, nil)
+end
+
 -- Make signal strict
 setmetatable(Signal, {
 	__index = function(tb, key)
