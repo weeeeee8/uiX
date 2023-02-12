@@ -15,7 +15,6 @@ local GenericUtility = UIX.Require:import('/lib/GenericUtility.lua')
 local Signal = UIX.Require:import('/modules/Signal.lua')
 warn("[Inline] Modules imported!")
 
-local CONFIGURATION_PATH = UIX.__internal.FilePaths.saves_folder..'/inlineConfig.json'
 local PLUGINS_PATH = UIX.__internal.FilePaths.plugins_folder..'/Inline'
 local TEXT_SIZE_Y = 15
 local MAXIMUM_LOGGED_MESSAGES = 100
@@ -30,8 +29,8 @@ local Events = {
     logOutput = Signal.new()
 }
 local States = {
-    windowShown = Fusion.State(false),
-    windowPosition = Fusion.State(UDim2.new(0.5, 0.2)),
+    windowShown = Fusion.State(true),
+    windowPosition = Fusion.State(UDim2.fromScale(0.5, 0.5)),
     logHistoryChildren = Fusion.State({})
 }
 local FusionComponents = {} do
@@ -131,7 +130,7 @@ local Utility = {} do
                         local mouseloc = UserInputService:GetMouseLocation()
 
                         self.canDrag = (mouseloc.X > tl.X and mouseloc.X < br.X) and (mouseloc.Y > br.Y and mouseloc.Y < tl.Y)
-                        if self.canDrag and self.dragging then
+                        if self.canDrag and self.dragging and self.hostObject.Visible then
                             self.positionState:set(self.hostObject.Position:Lerp(UDim2.new(
                                 self.hostObject.Position.X.Scale,
                                 (self.originDragPosition.X.Offset - mouseloc.X),
@@ -177,6 +176,7 @@ local Window = Fusion.New "ScreenGui" {
             BackgroundColor3 = Color3.fromRGB(27, 27, 27),
 
             Size = UDim2.fromOffset(400, 300),
+            AnchorPoint = Vector2.new(0.5, 0.5),
             Position = Fusion.Computed(function()
                 return States.windowPosition:get()
             end),
@@ -273,8 +273,6 @@ local Window = Fusion.New "ScreenGui" {
     }
 }
 
-print(Window.Parent)
-
 local DraggableObject = Utility.Draggable()
 DraggableObject:setPositionState(States.windowPosition):setHostObject(Window.Body):start()
 
@@ -284,7 +282,7 @@ end
 
 UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
     if gpe then return end
-    if inputObject.UserInputType == Enum.KeyCode.Backquote then
+    if inputObject.UserInputType == Enum.KeyCode.RightAlt then
         States.windowShown:set(not States.windowShown:get())
     end
 end))
