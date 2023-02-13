@@ -129,7 +129,6 @@ local Utility = {} do
                     self.dragging = false
                 end))
                 table.insert(self.connections, self.hostObject.MouseMoved:Connect(function()
-                    print(1)
                     if self.dragging and self.hostObject.Visible then
                         local mouseloc = UserInputService:GetMouseLocation()
                         self.positionState:set(UDim2.new(
@@ -181,6 +180,7 @@ local Window = Fusion.New "ScreenGui" {
             Size = UDim2.fromOffset(500, 200),
             AnchorPoint = Vector2.new(0.5, 0.5),
             Position = Fusion.Computed(function()
+                print(1)
                 return States.windowPosition:get()
             end),
             Visible = Fusion.Computed(function()
@@ -256,29 +256,41 @@ local Window = Fusion.New "ScreenGui" {
 
                                     BackgroundColor3 = Color3.fromRGB(12, 12, 12),
                                 },
-                                FusionComponents.UIPadding(2, 2, 2, 2),
-                                Fusion.New "TextBox" {
-                                    BackgroundTransparency = 1,
-                                    ZIndex = 3,
+                                Fusion.New "Frame" {
+                                    Name = "Content",
 
                                     Size = UDim2.fromScale(1, 1),
                                     Position = UDim2.fromScale(0.5, 0.5),
                                     AnchorPoint = Vector2.new(0.5, 0.5),
-
-                                    TextColor3 = Color3.fromRGB(235, 235, 235),
-
-                                    PlaceholderText = "input command here",
-                                    PlaceholderColor3 = Color3.fromRGB(117, 117, 117),
-
-                                    RichText = true,
-                                    MultiLine = false,
-                                    ClearTextOnFocus = false,
                                     
-                                    TextSize = TEXT_SIZE_Y,
-                                    Text = "",
+                                    BackgroundTransparency = 1,
 
-                                    TextYAlignment = Enum.TextYAlignment.Center,
-                                    TextXAlignment = Enum.TextXAlignment.Left,
+                                    [Fusion.Children] = {
+                                        FusionComponents.UIPadding(2, 2, 2, 2),
+                                        Fusion.New "TextBox" {
+                                            BackgroundTransparency = 1,
+                                            ZIndex = 3,
+        
+                                            Size = UDim2.fromScale(1, 1),
+                                            Position = UDim2.fromScale(0.5, 0.5),
+                                            AnchorPoint = Vector2.new(0.5, 0.5),
+        
+                                            TextColor3 = Color3.fromRGB(235, 235, 235),
+        
+                                            PlaceholderText = "input command here",
+                                            PlaceholderColor3 = Color3.fromRGB(117, 117, 117),
+        
+                                            RichText = true,
+                                            MultiLine = false,
+                                            ClearTextOnFocus = false,
+                                            
+                                            TextSize = TEXT_SIZE_Y,
+                                            Text = "",
+        
+                                            TextYAlignment = Enum.TextYAlignment.Center,
+                                            TextXAlignment = Enum.TextXAlignment.Left,
+                                        },
+                                    }
                                 },
                                 FusionComponents.UICorner(5),
                             }
