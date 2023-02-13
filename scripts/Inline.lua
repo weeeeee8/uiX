@@ -109,7 +109,7 @@ local Utility = {} do
         draggable.hostObject = nil
         draggable.positionState = nil
         draggable.id = HttpService:GenerateGUID(false)
-        draggable.originDragPosition = nil
+        draggable.originPosition = nil
         draggable.connections = {}
 
         draggable.smoothingSpeed = 1
@@ -128,9 +128,10 @@ local Utility = {} do
             if not self.started then
                 self.started = true
 
-                table.insert(self.connections, self.hostObject.InputBegan:Connect(function()
+                table.insert(self.connections, self.hostObject.InputBegan:Connect(function(inputObject)
                     self.dragging = true
-                    self.originDragPosition = self.hostObject.Position
+                    self.originPosition = UserInputService:GetMouseLocation()
+                    self.startPosition = self.hostObject.Position
                 end))
                 table.insert(self.connections, self.hostObject.InputEnded:Connect(function()
                     self.dragging = false
@@ -138,12 +139,12 @@ local Utility = {} do
                 table.insert(self.connections, self.hostObject.MouseMoved:Connect(function()
                     if self.dragging and self.hostObject.Visible then
                         local mouseloc = UserInputService:GetMouseLocation()
-                        print(1)
+                        local delta = mouseloc - self.originPosition
                         self.positionState:set(UDim2.new(
-                            self.hostObject.Position.X.Scale,
-                            (self.originDragPosition.X.Offset - mouseloc.X),
-                            self.hostObject.Position.Y.Scale,
-                            (self.originDragPosition.Y.Offset - mouseloc.Y)
+                            self.startPosition.X.Scale,
+                            (self.startPosition.X.Offset - delta.X),
+                            self.startPosition.Y.Scale,
+                            (self.startPosition.Y.Offset - delta.Y)
                         ))
                     end
                 end))
