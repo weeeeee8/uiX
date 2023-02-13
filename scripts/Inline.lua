@@ -24,15 +24,22 @@ local WARNING_LOG_MARKER = GenericUtility:Symbol("WarningLog")
 local INFO_LOG_MARKER = GenericUtility:Symbol("InfoLog")
 
 local Plugins = {}
-
 local Events = {
     logOutput = Signal.new()
 }
 local States = {
+    transparency = Fusion.State(1),
     windowShown = Fusion.State(false),
     windowPosition = Fusion.State(UDim2.fromScale(0.5, 0.5)),
     logHistoryChildren = Fusion.State({})
 }
+local Tweens = {
+    transparency = Fusion.Spring(States.transparency, 10, 0.9)
+}
+local Flags = {
+    windowShown = false
+}
+
 local FusionComponents = {} do
     local function getLocalTime()
         return DateTime.now():FormatLocalTime("LTS", "en-us")
@@ -87,7 +94,6 @@ local FusionComponents = {} do
 
                     Size = UDim2.new(1, 0, 0, 0),
                     BackgroundTransparency = 1,
-                    ZIndex = 3,
                 },
                 FusionComponents.UIPadding(3, 3, 3, 3),
             }
@@ -124,6 +130,7 @@ local Utility = {} do
 
                 table.insert(self.connections, self.hostObject.InputBegan:Connect(function()
                     self.dragging = true
+                    self.originDragPosition = self.hostObject.Position
                 end))
                 table.insert(self.connections, self.hostObject.InputEnded:Connect(function()
                     self.dragging = false
@@ -163,7 +170,6 @@ local Window = Fusion.New "ScreenGui" {
     Name = "InlineInterface",
     Parent = if gethui then gethui() else game:GetService("CoreGui"),
 
-    ZIndexBehavior = Enum.ZIndexBehavior.Global,
     DisplayOrder = 50,
 
     ResetOnSpawn = false,
@@ -171,8 +177,12 @@ local Window = Fusion.New "ScreenGui" {
     Enabled = true,
 
     [Fusion.Children] = {
-        Fusion.New "Frame" {
+        Fusion.New "CanvasGroup" {
             Name = "Body",
+
+            GroupTransparency =  Fusion.Computed(function()
+                return Tweens.transparency:get()
+            end),
 
             BorderSizePixel = 0,
             BackgroundTransparency = 0,
@@ -181,11 +191,7 @@ local Window = Fusion.New "ScreenGui" {
             Size = UDim2.fromOffset(500, 200),
             AnchorPoint = Vector2.new(0.5, 0.5),
             Position = Fusion.Computed(function()
-                print(1)
                 return States.windowPosition:get()
-            end),
-            Visible = Fusion.Computed(function()
-                return States.windowShown:get()
             end),
 
             [Fusion.Children] = {
@@ -235,7 +241,6 @@ local Window = Fusion.New "ScreenGui" {
                     
                     [Fusion.Children] = {
                         Fusion.New "Frame" {
-                            ZIndex = 2,
                             BorderSizePixel = 0,
 
                             Size = UDim2.fromScale(1, 1),
@@ -253,7 +258,6 @@ local Window = Fusion.New "ScreenGui" {
                                     AnchorPoint = Vector2.new(0.5, 0),
                                     
                                     BorderSizePixel = 0,
-                                    ZIndex = 2,
 
                                     BackgroundColor3 = Color3.fromRGB(12, 12, 12),
                                 },
@@ -270,7 +274,6 @@ local Window = Fusion.New "ScreenGui" {
                                         FusionComponents.UIPadding(2, 2, 2, 2),
                                         Fusion.New "TextBox" {
                                             BackgroundTransparency = 1,
-                                            ZIndex = 3,
         
                                             Size = UDim2.fromScale(1, 1),
                                             Position = UDim2.fromScale(0.5, 0.5),
@@ -315,7 +318,8 @@ end
 UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
     if gpe then return end
     if inputObject.KeyCode == Enum.KeyCode.Backquote then
-        States.windowShown:set(not States.windowShown:get())
+        Flags.windowShown = not Flags.windowShown
+        States.transparency:set(if Flags.windowShown then 0 else 1)
     end
 end))
 
