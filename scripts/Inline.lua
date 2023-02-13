@@ -129,12 +129,16 @@ local Utility = {} do
                 self.started = true
 
                 table.insert(self.connections, self.hostObject.InputBegan:Connect(function(inputObject)
-                    self.dragging = true
-                    self.originPosition = UserInputService:GetMouseLocation()
-                    self.startPosition = self.hostObject.Position
+                    if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+                        self.dragging = true
+                        self.originPosition = UserInputService:GetMouseLocation()
+                        self.startPosition = self.hostObject.Position
+                    end
                 end))
-                table.insert(self.connections, self.hostObject.InputEnded:Connect(function()
-                    self.dragging = false
+                table.insert(self.connections, self.hostObject.InputEnded:Connect(function(inputObject)
+                    if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+                        self.dragging = false
+                    end
                 end))
                 table.insert(self.connections, self.hostObject.MouseMoved:Connect(function()
                     if self.dragging and self.hostObject.Visible then
@@ -142,9 +146,9 @@ local Utility = {} do
                         local delta = mouseloc - self.originPosition
                         self.positionState:set(UDim2.new(
                             self.startPosition.X.Scale,
-                            (self.startPosition.X.Offset - delta.X),
+                            (self.startPosition.X.Offset + delta.X),
                             self.startPosition.Y.Scale,
-                            (self.startPosition.Y.Offset - delta.Y)
+                            (self.startPosition.Y.Offset + delta.Y)
                         ))
                     end
                 end))
