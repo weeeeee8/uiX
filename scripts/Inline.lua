@@ -34,7 +34,7 @@ local States = {
     logHistoryChildren = Fusion.State({})
 }
 local Tweens = {
-    transparency = Fusion.Spring(States.transparency, 10, 0.9)
+    transparency = Fusion.Spring(States.transparency, 13, 0.9)
 }
 local Flags = {
     windowShown = false
@@ -180,13 +180,7 @@ local Window = Fusion.New "ScreenGui" {
         Fusion.New "CanvasGroup" {
             Name = "Body",
 
-            GroupTransparency =  Fusion.Computed(function()
-                return Tweens.transparency:get()
-            end),
-
-            BorderSizePixel = 0,
-            BackgroundTransparency = 0,
-            BackgroundColor3 = Color3.fromRGB(27, 27, 27),
+            BackgroundTransparency = 1,
 
             Size = UDim2.fromOffset(500, 200),
             AnchorPoint = Vector2.new(0.5, 0.5),
@@ -194,7 +188,20 @@ local Window = Fusion.New "ScreenGui" {
                 return States.windowPosition:get()
             end),
 
+            GroupTransparency =  Fusion.Computed(function()
+                return Tweens.transparency:get()
+            end),
+
             [Fusion.Children] = {
+                Fusion.New "Frame" {
+                    Name = "Background",
+                    
+                    BorderSizePixel = 0,
+                    BackgroundColor3 = Color3.fromRGB(27, 27, 27),
+                    Size = UDim2.fromScale(1, 1),
+                    Position = UDim2.fromScale(0.5, 0.5),
+                    AnchorPoint = Vector2.new(0.5, 0.5),
+                },
                 Fusion.New "Frame" {
                     Name = "LogHistory",
                     BackgroundTransparency = 1,
@@ -320,6 +327,7 @@ UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
     if inputObject.KeyCode == Enum.KeyCode.Backquote then
         Flags.windowShown = not Flags.windowShown
         States.transparency:set(if Flags.windowShown then 0 else 1)
+        print(Flags.windowShown)
     end
 end))
 
