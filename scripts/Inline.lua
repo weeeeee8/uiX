@@ -131,6 +131,7 @@ local Utility = {} do
                 table.insert(self.connections, self.hostObject.MouseMoved:Connect(function()
                     if self.dragging and self.hostObject.Visible then
                         local mouseloc = UserInputService:GetMouseLocation()
+                        print(1)
                         self.positionState:set(UDim2.new(
                             self.hostObject.Position.X.Scale,
                             (self.originDragPosition.X.Offset - mouseloc.X),
@@ -313,7 +314,7 @@ end
 
 UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
     if gpe then return end
-    if inputObject.UserInputType == Enum.KeyCode.P then
+    if inputObject.KeyCode == Enum.KeyCode.Backquote then
         States.windowShown:set(not States.windowShown:get())
     end
 end))
