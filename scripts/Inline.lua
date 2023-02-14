@@ -383,7 +383,7 @@ local function focusCommandInput()
 
     textbox:CaptureFocus()
     InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("Text"):Connect(function()
-        local new_text = textbox.Text
+        local new_text = textbox.ContentText
         local command_content = string.split(new_text, " ")
         local foundPlugin = findPluginFromPrefix(command_content[1])
 
