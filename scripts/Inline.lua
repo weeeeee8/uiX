@@ -384,17 +384,19 @@ local function focusCommandInput()
     textbox:CaptureFocus()
     InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("ContentText"):Connect(function()
         local new_text = textbox.ContentText:gsub("[\t\r]", "")
-        local command_content = string.split(new_text, " ")
-        local foundPlugin = findPluginFromPrefix(command_content[1])
+        if new_text ~= nil then
+            local command_content = string.split(new_text, " ")
+            local foundPlugin = findPluginFromPrefix(command_content[1])
 
-        if foundPlugin then
-            if not activePlugin then
-                activePlugin = foundPlugin
+            if foundPlugin then
+                if not activePlugin then
+                    activePlugin = foundPlugin
+                end
             end
+            
+            new_text = wrapTextInColor(command_content[1], 255, 188, 0)
+            textbox.Text = new_text
         end
-        
-        new_text = wrapTextInColor(command_content[1], 255, 188, 0)
-        textbox.Text = new_text
     end))
 end
 
