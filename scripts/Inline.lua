@@ -375,13 +375,13 @@ local function focusCommandInput()
     local textbox = Window:FindFirstChild("InputFocus", true) :: TextBox
     
     local function wrapTextInColor(text, r, g, b)
+        text = text:gsub("<", ""):gsub(">", "")
         return string.format('<font color="rgb(%i,%i,%i)">%s</font>', r or 0, g or 0, b or 0, text)
     end
 
     textbox:ReleaseFocus(false)
     InlineMaid:DoCleaning()
 
-    textbox:CaptureFocus()
     InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("ContentText"):Connect(function()
         local new_text = textbox.ContentText:gsub("[\t\r]", "")
         if new_text ~= nil then
@@ -398,6 +398,8 @@ local function focusCommandInput()
             textbox.Text = new_text
         end
     end))
+
+    textbox:CaptureFocus()
 end
 
 UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
