@@ -13,6 +13,7 @@ local UIX = loadstring(game:HttpGet(string.format(
 local Fusion = UIX.Require:import('/modules/fusion/Fusion.lua')
 local GenericUtility = UIX.Require:import('/lib/GenericUtility.lua')
 local Signal = UIX.Require:import('/modules/Signal.lua')
+local Maid = UIX.Require:get('Maid')
 warn("[Inline] Modules imported!")
 
 local PLUGINS_PATH = UIX.__internal.FilePaths.plugins_folder..'/Inline'
@@ -23,7 +24,29 @@ local ERROR_LOG_MARKER = GenericUtility:Symbol("ErrorLog")
 local WARNING_LOG_MARKER = GenericUtility:Symbol("WarningLog")
 local INFO_LOG_MARKER = GenericUtility:Symbol("InfoLog")
 
-local Plugins = {}
+local InlineMaid = Maid.new()
+local Plugins = {} do
+    Plugins[{
+        Prefix = "*",
+        Commands = {
+            {
+                Name = "import",
+                Arguments = {
+                    {"string", "pluginName", true}
+                },
+                Callback = function(pluginName)
+                    if not pluginName:find(".lua") then
+                        pluginName = pluginName .. pluginName
+                    end
+                    local success, foundPlugin = pcall(readfile, PLUGINS_PATH .. '/' .. pluginName)
+                    if success then
+                        Plugins[foundPlugin()] = true
+                    end
+                end,
+            }
+        }
+    }] = true
+end
 local Events = {
     logOutput = Signal.new()
 }
@@ -205,6 +228,11 @@ local Window = Fusion.New "ScreenGui" {
                     Size = UDim2.fromScale(1, 1),
                     Position = UDim2.fromScale(0.5, 0.5),
                     AnchorPoint = Vector2.new(0.5, 0.5),
+
+                    [Fusion.Children] = {
+                        FusionComponents.UIPadding(3, 3, 3, 3),
+                        FusionComponents.UICorner(5),
+                    }
                 },
                 Fusion.New "Frame" {
                     Name = "Content",
@@ -322,8 +350,6 @@ local Window = Fusion.New "ScreenGui" {
                                 }
                             }
                         },
-                        FusionComponents.UIPadding(3, 3, 3, 3),
-                        FusionComponents.UICorner(5),
                     }
                 }
             }
@@ -334,16 +360,56 @@ local Window = Fusion.New "ScreenGui" {
 local DraggableObject = Utility.Draggable()
 DraggableObject:setPositionState(States.windowPosition):setHostObject(Window.Body):start()
 
+local function findPluginFromPrefix(prefix)
+    for plugin in pairs(Plugins) do
+        if plugin.Prefix:lower() == prefix:lower() then
+            return plugin
+        end
+    end
+    return nil
+end
+
 local function focusCommandInput()
+    local activePlugin
     local textbox = Window.Body.InputContainer.Frame.TextBox :: TextBox
+    
+    local function wrapTextInColor(text, r, g, b)
+        return string.format('<font color="rgb(%i,%i,%i)">%s</font>', r or 0, g or 0, b or 0, text)
+    end
+
+    textbox:ReleaseFocus(false)
+    InlineMaid:DoCleaning()
+
+    textbox:CaptureFocus()
+    InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("Text"):Connect(function()
+        local new_text = textbox.Text
+        local command_content = string.split(new_text, " ")
+        local foundPlugin = findPluginFromPrefix(command_content[1])
+
+        if foundPlugin then
+            if not activePlugin then
+                activePlugin = foundPlugin
+            end
+        end
+        
+        new_text = wrapTextInColor(command_content[1], 255, 188, 0)
+
+        if textbox.ContentText ~= new_text then
+            textbox.Text = new_text
+        end
+    end))
 end
 
 UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
     if gpe then return end
     if inputObject.KeyCode == Enum.KeyCode.Backquote then
         Flags.windowShown = not Flags.windowShown
-        States.transparency:set(if Flags.windowShown then 0 else 1)
-        print(Flags.windowShown)
+        if Flags.windowShown then
+            States.transparency:set(0)
+            focusCommandInput()
+        else
+            States.transparency:set(1)
+        end
     end
 end))
 
@@ -365,6 +431,11 @@ end))
 UIX.Maid:GiveTask(function() -- cleaning
     for _, signal in pairs(Events) do
         signal:Destroy()
+    end
+    for plugin in pairs(Plugins) do
+        if plugin.Clean then
+            plugin:Clean()
+        end
     end
     Window:Destroy()
     DraggableObject:stop()
