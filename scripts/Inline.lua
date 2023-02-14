@@ -324,22 +324,34 @@ local Window = Fusion.New "ScreenGui" {
                                                 Fusion.New "TextBox" {
                                                     Name = "InputFocus",
                                                     BackgroundTransparency = 1,
+                                                    TextTransparency = 1,
                 
                                                     Size = UDim2.fromScale(1, 1),
                                                     Position = UDim2.fromScale(0.5, 0.5),
                                                     AnchorPoint = Vector2.new(0.5, 0.5),
                 
-                                                    TextColor3 = Color3.fromRGB(235, 235, 235),
-                
-                                                    PlaceholderText = "input command here",
-                                                    PlaceholderColor3 = Color3.fromRGB(117, 117, 117),
                 
                                                     RichText = true,
-                                                    MultiLine = false,
+                                                    MultiLine = true,
                                                     ClearTextOnFocus = true,
                                                     
                                                     TextSize = TEXT_SIZE_Y,
                                                     Text = "",
+                
+                                                    TextYAlignment = Enum.TextYAlignment.Center,
+                                                    TextXAlignment = Enum.TextXAlignment.Center,
+                                                },
+                                                Fusion.New "TextLabel" {
+                                                    Name = "InputDisplay",
+                                                    BackgroundTransparency = 1,
+                
+                                                    Size = UDim2.fromScale(1, 1),
+                                                    Position = UDim2.fromScale(0.5, 0.5),
+                                                    AnchorPoint = Vector2.new(0.5, 0.5),
+
+                                                    TextSize = TEXT_SIZE_Y,
+                                                    Text = "",
+                                                    RichText = true,
                 
                                                     TextYAlignment = Enum.TextYAlignment.Center,
                                                     TextXAlignment = Enum.TextXAlignment.Left,
@@ -373,18 +385,24 @@ end
 local function focusCommandInput()
     local activePlugin
     local textbox = Window:FindFirstChild("InputFocus", true) :: TextBox
+    local label = Window:FindFirstChild("InputDisplay", true) :: TextLabel
     
     local function wrapTextInColor(text, r, g, b)
         text = text:gsub("<", ""):gsub(">", "")
         return string.format('<font color="rgb(%i,%i,%i)">%s</font>', r or 0, g or 0, b or 0, text)
     end
 
+    local function resetCommandLine()
+        label.Text = "input command here"
+        textbox.Text = ""    
+    end
+
     textbox:ReleaseFocus(false)
     InlineMaid:DoCleaning()
 
-    InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("ContentText"):Connect(function()
-        local new_text = textbox.ContentText:gsub("[\t\r]", "")
-        if new_text ~= nil then
+    InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("Text"):Connect(function()
+        local new_text = textbox.Text:gsub("[\t\r]", "")
+        if new_text ~= "" then
             local command_content = string.split(new_text, " ")
             local foundPlugin = findPluginFromPrefix(command_content[1])
 
@@ -395,9 +413,11 @@ local function focusCommandInput()
             end
             
             new_text = wrapTextInColor(command_content[1], 255, 188, 0)
-            textbox.Text = new_text
+            label.Text = new_text
         end
     end))
+
+    resetCommandLine()
 
     textbox:CaptureFocus()
 end
