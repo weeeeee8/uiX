@@ -322,6 +322,7 @@ local Window = Fusion.New "ScreenGui" {
                                             [Fusion.Children] = {
                                                 FusionComponents.UIPadding(2, 2, 2, 2),
                                                 Fusion.New "TextBox" {
+                                                    Name = "InputFocus",
                                                     BackgroundTransparency = 1,
                 
                                                     Size = UDim2.fromScale(1, 1),
@@ -371,7 +372,7 @@ end
 
 local function focusCommandInput()
     local activePlugin
-    local textbox = Window.Body.InputContainer.Frame.TextBox :: TextBox
+    local textbox = Window:FindFirstChild("InputFocus", true) :: TextBox
     
     local function wrapTextInColor(text, r, g, b)
         return string.format('<font color="rgb(%i,%i,%i)">%s</font>', r or 0, g or 0, b or 0, text)
