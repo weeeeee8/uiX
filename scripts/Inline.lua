@@ -349,6 +349,8 @@ local Window = Fusion.New "ScreenGui" {
                                                     Position = UDim2.fromScale(0.5, 0.5),
                                                     AnchorPoint = Vector2.new(0.5, 0.5),
 
+                                                    TextColor3 = Color3.fromRGB(235, 235, 235),
+
                                                     TextSize = TEXT_SIZE_Y,
                                                     Text = "",
                                                     RichText = true,
@@ -470,10 +472,11 @@ local function focusCommandInput()
         end
     end))
 
-    resetCommandLine()
-
-    task.wait(0.1)
-    textbox:CaptureFocus()
+    task.spawn(function()
+        resetCommandLine()
+        task.wait(0.1)
+        textbox:CaptureFocus()
+    end)
 end
 
 UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
