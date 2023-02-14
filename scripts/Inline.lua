@@ -474,6 +474,7 @@ local function focusCommandInput()
 
     resetCommandLine()
 
+    task.wait(0.1)
     textbox:CaptureFocus()
 end
 
