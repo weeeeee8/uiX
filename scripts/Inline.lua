@@ -383,10 +383,27 @@ local function findPluginFromPrefix(prefix)
 end
 
 local function focusCommandInput()
-    local activePlugin
+    local activePlugin, activeCommand
+    local currentCommandContext = ""
     local textbox = Window:FindFirstChild("InputFocus", true) :: TextBox
     local label = Window:FindFirstChild("InputDisplay", true) :: TextLabel
     
+    local function findCommandsFromText(text)
+        if activePlugin then
+            local foundCommands = {}
+            for _, command in ipairs(activePlugin.Commands) do
+                if command.Name:sub(1, #text) == text then
+                    table.insert(foundCommands, {size = #command.Name, command = command})
+                end
+            end
+            table.sort(foundCommands, function(a, b)
+                return a.size < b.size
+            end)
+            return foundCommands
+        end
+        return nil
+    end
+
     local function wrapTextInColor(text, r, g, b)
         text = text:gsub("<", ""):gsub(">", "")
         return string.format('<font color="rgb(%i,%i,%i)">%s</font>', r or 0, g or 0, b or 0, text)
@@ -400,20 +417,58 @@ local function focusCommandInput()
     textbox:ReleaseFocus(false)
     InlineMaid:DoCleaning()
 
+    InlineMaid:GiveTask(textbox.FocusLost:Connect(function(invoked)
+        local input = label.ContentText
+        if invoked then
+        else
+            Events.logOutput:Fire({text = "Command '" .. string.split(input, " ")[1] .. ''})
+        end
+    end))
+
     InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("Text"):Connect(function()
         local new_text = textbox.Text:gsub("[\t\r]", "")
         if new_text ~= "" then
-            local command_content = string.split(new_text, " ")
-            local foundPlugin = findPluginFromPrefix(command_content[1])
+            local context = string.split(new_text, " ")
+            local foundPlugin = findPluginFromPrefix(context[1])
 
             if foundPlugin then
                 if not activePlugin then
                     activePlugin = foundPlugin
                 end
             end
+
+            if activePlugin then
+                local arguments = table.unpack(context, 2, -1)
+                if #arguments == 1 then
+                    currentCommandContext = arguments[2]
+                    local foundCommands = findCommandsFromText(currentCommandContext)
+                    if foundCommands or #foundCommands > 0 then
+                        activeCommand = foundCommands[1].command
+                    end
+                else
+
+                end
+            end
             
-            new_text = wrapTextInColor(command_content[1], 255, 188, 0)
+            new_text = wrapTextInColor(context[1], 255, 188, 0)
+            if activeCommand then
+                new_text = new_text .. wrapTextInColor(context[2], 0, 88, 255)
+            end
+
             label.Text = new_text
+        end
+    end))
+
+    InlineMaid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
+        if gpe then return end
+        if inputObject.KeyCode == Enum.KeyCode.Tab then
+            local foundCommands = findCommandsFromText(currentCommandContext)
+            if foundCommands or #foundCommands > 0 then
+                activeCommand = foundCommands[1].command
+                local context = string.split(textbox.Text, " ")
+                local newtext = context[1] .. activeCommand.Name .. " "
+                textbox.Text = newtext
+            end
         end
     end))
 
