@@ -336,7 +336,7 @@ local Window = Fusion.New "ScreenGui" {
                 
                                                     RichText = true,
                                                     MultiLine = false,
-                                                    ClearTextOnFocus = false,
+                                                    ClearTextOnFocus = true,
                                                     
                                                     TextSize = TEXT_SIZE_Y,
                                                     Text = "",
@@ -382,8 +382,8 @@ local function focusCommandInput()
     InlineMaid:DoCleaning()
 
     textbox:CaptureFocus()
-    InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("Text"):Connect(function()
-        local new_text = textbox.ContentText
+    InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("ContentText"):Connect(function()
+        local new_text = textbox.ContentText:gsub("[\t\r]", "")
         local command_content = string.split(new_text, " ")
         local foundPlugin = findPluginFromPrefix(command_content[1])
 
@@ -394,10 +394,7 @@ local function focusCommandInput()
         end
         
         new_text = wrapTextInColor(command_content[1], 255, 188, 0)
-
-        if textbox.ContentText ~= new_text then
-            textbox.Text = new_text
-        end
+        textbox.Text = new_text
     end))
 end
 
