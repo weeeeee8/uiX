@@ -426,37 +426,35 @@ local function focusCommandInput()
     end))
 
     InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("Text"):Connect(function()
-        local new_text = textbox.Text:gsub("[\t\r]", "")
-        if new_text ~= "" then
-            local context = string.split(new_text, " ")
-            local foundPlugin = findPluginFromPrefix(context[1])
+        local new_text = textbox.Text
+        local context = string.split(new_text, " ")
+        local foundPlugin = findPluginFromPrefix(context[1])
 
-            if foundPlugin then
-                if not activePlugin then
-                    activePlugin = foundPlugin
-                end
+        if foundPlugin then
+            if not activePlugin then
+                activePlugin = foundPlugin
             end
-
-            if activePlugin then
-                local arguments = table.unpack(context, 2, -1)
-                if #arguments == 1 then
-                    currentCommandContext = arguments[2]
-                    local foundCommands = findCommandsFromText(currentCommandContext)
-                    if foundCommands or #foundCommands > 0 then
-                        activeCommand = foundCommands[1].command
-                    end
-                else
-
-                end
-            end
-            
-            new_text = wrapTextInColor(context[1], 255, 188, 0)
-            if activeCommand then
-                new_text = new_text .. wrapTextInColor(context[2], 0, 88, 255)
-            end
-
-            label.Text = new_text
         end
+
+        if activePlugin then
+            local arguments = table.unpack(context, 2, -1)
+            if #arguments == 1 then
+                currentCommandContext = arguments[2]
+                local foundCommands = findCommandsFromText(currentCommandContext)
+                if foundCommands or #foundCommands > 0 then
+                    activeCommand = foundCommands[1].command
+                end
+            else
+
+            end
+        end
+        
+        new_text = wrapTextInColor(context[1], 255, 188, 0)
+        if activeCommand then
+            new_text = new_text .. wrapTextInColor(context[2], 0, 88, 255)
+        end
+
+        label.Text = new_text
     end))
 
     InlineMaid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
