@@ -131,7 +131,7 @@ local Utility = {} do
     function Utility.Draggable()
         local draggable = {}
         draggable.dragging = false
-        draggable.canDrag = false
+        draggable.isInFrame = false
         draggable.hostObject = nil
         draggable.positionState = nil
         draggable.id = HttpService:GenerateGUID(false)
@@ -154,7 +154,6 @@ local Utility = {} do
             local mouseloc = UserInputService:GetMouseLocation()
             local ap, as = self.hostObject.AbsolutePosition, self.hostObject.AbsoluteSize
             local tl, br = ap, ap + as
-            print(mouseloc.X, tl.X, br.X, '|', mouseloc.Y, tl.Y, br.Y, '|', (mouseloc.X > tl.X and mouseloc.X < br.X) and (mouseloc.Y > br.Y and mouseloc.Y < tl.Y))
             return (mouseloc.X > tl.X and mouseloc.X < br.X) and (mouseloc.Y > br.Y and mouseloc.Y < tl.Y)
         end
 
@@ -175,6 +174,8 @@ local Utility = {} do
                     end
                 end))
                 table.insert(self.connections, self.hostObject.MouseMoved:Connect(function()
+                    self.isInFrame = self:isMouseInsideFrame()
+                    
                     if self.dragging and self.hostObject.Visible then
                         local mouseloc = UserInputService:GetMouseLocation()
                         local delta = mouseloc - self.originPosition
@@ -531,7 +532,7 @@ UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
     if gpe then return end
     if inputObject.KeyCode == Enum.KeyCode.Backquote then
         toggleCommandPrompt()
-    elseif inputObject.UserInputType == Enum.UserInputType.MouseButton1 and not DraggableObject:isMouseInsideFrame() then
+    elseif inputObject.UserInputType == Enum.UserInputType.MouseButton1 and not DraggableObject.isInFrame then
         if Flags.windowShown then
             toggleCommandPrompt()
         end
