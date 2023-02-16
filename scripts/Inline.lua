@@ -24,7 +24,7 @@ local ERROR_LOG_MARKER = GenericUtility:Symbol("ErrorLog")
 local WARNING_LOG_MARKER = GenericUtility:Symbol("WarningLog")
 local INFO_LOG_MARKER = GenericUtility:Symbol("InfoLog")
 local INVALID_CHARACTERS = {
-    '`', '%', '(', ')', '<', '>'
+    '`', '(', ')', '<', '>'
 }
 
 local InlineMaid = Maid.new()
@@ -343,7 +343,6 @@ local Window = Fusion.New "ScreenGui" {
                 
                 
                                                     RichText = true,
-                                                    MultiLine = true,
                                                     ClearTextOnFocus = true,
                                                     
                                                     TextSize = TEXT_SIZE_Y,
