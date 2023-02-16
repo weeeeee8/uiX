@@ -421,8 +421,9 @@ local function focusCommandInput()
     InlineMaid:GiveTask(textbox.FocusLost:Connect(function(invoked)
         local input = label.ContentText
         if invoked then
+            Events.logOutput:Fire({text = label.Text})
         else
-            Events.logOutput:Fire({text = "Command '" .. string.split(input, " ")[1] .. ''})
+            Events.logOutput:Fire({text = "Command '" .. string.split(input, " ")[1] .. "'"})
         end
     end))
 
@@ -446,14 +447,12 @@ local function focusCommandInput()
                     activeCommand = foundCommands[1].command
                 end
             else
-                
+
             end
         end
         
         new_text = wrapTextInColor(context[1], 255, 188, 0)
-        if activeCommand then
-            new_text = new_text .. wrapTextInColor(context[2], 0, 88, 255)
-        end
+        new_text = new_text .. wrapTextInColor(context[2], 0, 88, 255)
 
         label.Text = new_text
     end))
