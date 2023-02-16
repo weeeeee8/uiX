@@ -413,10 +413,9 @@ local function focusCommandInput()
 
     local function resetCommandLine()
         label.Text = "input command here"
-        textbox.Text = ""    
+        textbox.Text = ""
     end
 
-    textbox:ReleaseFocus(false)
     InlineMaid:DoCleaning()
 
     InlineMaid:GiveTask(textbox.FocusLost:Connect(function(invoked)
@@ -447,7 +446,7 @@ local function focusCommandInput()
                     activeCommand = foundCommands[1].command
                 end
             else
-
+                
             end
         end
         
@@ -472,22 +471,31 @@ local function focusCommandInput()
         end
     end))
 
-    task.spawn(function()
+    InlineMaid:GiveTask(function()
+        textbox:ReleaseFocus(false)
         resetCommandLine()
-        task.wait(0.1)
-        textbox:CaptureFocus()
     end)
+
+    task.delay(0.1, textbox.CaptureFocus, textbox)
+end
+
+local function toggleCommandPrompt()
+    Flags.windowShown = not Flags.windowShown
+    if Flags.windowShown then
+        States.transparency:set(0)
+        focusCommandInput()
+    else
+        States.transparency:set(1)
+    end
 end
 
 UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
     if gpe then return end
     if inputObject.KeyCode == Enum.KeyCode.Backquote then
-        Flags.windowShown = not Flags.windowShown
+        toggleCommandPrompt()
+    elseif inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
         if Flags.windowShown then
-            States.transparency:set(0)
-            focusCommandInput()
-        else
-            States.transparency:set(1)
+            toggleCommandPrompt()
         end
     end
 end))
