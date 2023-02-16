@@ -412,7 +412,7 @@ local function focusCommandInput()
     end
 
     local function resetCommandLine()
-        label.Text = "input command here"
+        label.Text = "start typing to invoke a command"
         textbox.Text = ""
     end
 
