@@ -23,6 +23,9 @@ local MAXIMUM_LOGGED_MESSAGES = 100
 local ERROR_LOG_MARKER = GenericUtility:Symbol("ErrorLog")
 local WARNING_LOG_MARKER = GenericUtility:Symbol("WarningLog")
 local INFO_LOG_MARKER = GenericUtility:Symbol("InfoLog")
+local INVALID_CHARACTERS = {
+    '`', '%', '(', ')', '<', '>'
+}
 
 local InlineMaid = Maid.new()
 local Plugins = {} do
@@ -446,9 +449,13 @@ local function focusCommandInput()
     end))
 
     InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("Text"):Connect(function()
-        local new_text = textbox.Text:gsub("[\t]", ""):gsub('`', '')
-        if new_text ~= "" then
-            local context = string.split(new_text, " ")
+        local new_text = textbox.Text:gsub("[\t]", "")
+        for _, invalid in INVALID_CHARACTERS do
+            new_text = new_text:gsub(invalid, '')
+        end
+
+        local context = string.split(new_text, " ")
+        if #context > 0 then
             local foundPlugin = findPluginFromPrefix(context[1])
 
             if foundPlugin then
@@ -456,28 +463,28 @@ local function focusCommandInput()
                     activePlugin = foundPlugin
                 end
             end
-            
-            new_text = wrapTextInColor(context[1], 255, 188, 0)
-            if #context > 1 then
-                if activePlugin then
-                    local tempContext = context
-                    table.remove(tempContext, 1)
 
-                    local arguments = table.unpack(tempContext, 2, -1)
-                    if #arguments == 1 then
-                        currentCommandContext = arguments[2]
-                        local foundCommands = findCommandsFromText(currentCommandContext)
-                        if foundCommands or #foundCommands > 0 then
-                            activeCommand = foundCommands[1].command
-                        end
-                    else
-                        for n = 2, #arguments do
-                            currentArguments[n] = arguments[n]
-                        end
+            if activePlugin then
+                local tempContext = context
+                table.remove(tempContext, 1)
+
+                local arguments = table.unpack(tempContext)
+                if #arguments == 1 then
+                    currentCommandContext = arguments[2]
+                    local foundCommands = findCommandsFromText(currentCommandContext)
+                    if foundCommands or #foundCommands > 0 then
+                        activeCommand = foundCommands[1].command
+                    end
+                else
+                    for n = 2, #arguments do
+                        currentArguments[n] = arguments[n]
                     end
                 end
+            end
 
-                for i = 2, #context do
+            new_text = wrapTextInColor(context[1], 255, 188, 0)
+            if #context > 1 then
+                for i = 2, #context, 1 do
                     if i == 2 then
                         new_text = new_text .. wrapTextInColor(context[i], 0, 88, 255)
                     else
@@ -487,7 +494,7 @@ local function focusCommandInput()
             end
 
             label.Text = new_text
-        end 
+        end
     end))
 
     InlineMaid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
