@@ -151,7 +151,8 @@ local Utility = {} do
             local mouseloc = UserInputService:GetMouseLocation()
             local ap, as = self.hostObject.AbsolutePosition, self.hostObject.AbsoluteSize
             local tl, br = ap, ap + as
-            return (mouseloc.X >= tl.X and mouseloc.X <= br.X) and (mouseloc.Y >= br.Y and mouseloc.Y <= tl.Y)
+            print((mouseloc.X > tl.X and mouseloc.X < br.X) and (mouseloc.Y > br.Y and mouseloc.Y < tl.Y))
+            return (mouseloc.X > tl.X and mouseloc.X < br.X) and (mouseloc.Y > br.Y and mouseloc.Y < tl.Y)
         end
 
         function draggable:start()
@@ -459,7 +460,10 @@ local function focusCommandInput()
             new_text = wrapTextInColor(context[1], 255, 188, 0)
             if #context > 1 then
                 if activePlugin then
-                    local arguments = table.unpack(context, 2, -1)
+                    local tempContext = context
+                    table.remove(tempContext, 1)
+
+                    local arguments = table.unpack(tempContext, 2, -1)
                     if #arguments == 1 then
                         currentCommandContext = arguments[2]
                         local foundCommands = findCommandsFromText(currentCommandContext)
