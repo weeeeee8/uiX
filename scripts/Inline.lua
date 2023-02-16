@@ -428,7 +428,7 @@ local function focusCommandInput()
     end))
 
     InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("Text"):Connect(function()
-        local new_text = textbox.Text
+        local new_text = textbox.Text:gsub("[\t\r]", ""):gsub('`', '')
         local context = string.split(new_text, " ")
         local foundPlugin = findPluginFromPrefix(context[1])
 
