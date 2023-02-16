@@ -271,7 +271,7 @@ local Window = Fusion.New "ScreenGui" {
                                         Fusion.ComputedPairs(States.logHistoryChildren, function(logData)
                                             return FusionComponents.Message {
                                                 ContextText = logData.text,
-                                                LogType = logData.type,
+                                                LogType = logData.type or INFO_LOG_MARKER,
                                             }
                                         end)
                                     }
@@ -386,7 +386,8 @@ end
 
 local function focusCommandInput()
     local activePlugin, activeCommand
-    local currentCommandContext = ""
+    local currentCommandContext, currentPluginContext = "", ""
+    local currentArguments = {}
     local textbox = Window:FindFirstChild("InputFocus", true) :: TextBox
     local label = Window:FindFirstChild("InputDisplay", true) :: TextLabel
     
@@ -407,23 +408,32 @@ local function focusCommandInput()
     end
 
     local function wrapTextInColor(text, r, g, b)
-        text = text:gsub("<", ""):gsub(">", "")
+        text = (text or ""):gsub("<", ""):gsub(">", "")
         return string.format('<font color="rgb(%i,%i,%i)">%s</font>', r or 0, g or 0, b or 0, text)
     end
 
     local function resetCommandLine()
         label.Text = "start typing to invoke a command"
         textbox.Text = ""
+        activePlugin, activeCommand = nil, nil
+        currentPluginContext, currentCommandContext = "", ""
     end
 
     InlineMaid:DoCleaning()
 
     InlineMaid:GiveTask(textbox.FocusLost:Connect(function(invoked)
-        local input = label.ContentText
         if invoked then
-            Events.logOutput:Fire({text = label.Text})
+            if activePlugin then
+                if activeCommand then
+                    Events.logOutput:Fire({text = "Test successful"})
+                else
+                    Events.logOutput:Fire({text = "Cannot find command '" .. currentCommandContext .. "' in the '" .. currentPluginContext "' plugin", type = ERROR_LOG_MARKER})
+                end
+            else
+                Events.logOutput:Fire({text = "Cannot find plugin '" .. currentPluginContext .. "'", type = ERROR_LOG_MARKER})
+            end
         else
-            Events.logOutput:Fire({text = "Command '" .. string.split(input, " ")[1] .. "'"})
+            Events.logOutput:Fire({text = "Exited console, cancelled last command", type = WARNING_LOG_MARKER})
         end
     end))
 
@@ -447,12 +457,22 @@ local function focusCommandInput()
                     activeCommand = foundCommands[1].command
                 end
             else
-
+                for n = 2, #arguments do
+                    currentArguments[n] = arguments[n]
+                end
             end
         end
         
         new_text = wrapTextInColor(context[1], 255, 188, 0)
-        new_text = new_text .. wrapTextInColor(context[2], 0, 88, 255)
+        if #context > 1 then
+            for i = 2, #context do
+                if i == 2 then
+                    new_text = new_text .. wrapTextInColor(context[i], 0, 88, 255)
+                else
+                    new_text = new_text .. wrapTextInColor(context[i], 235, 235, 235)
+                end
+            end
+        end
 
         label.Text = new_text
     end))
