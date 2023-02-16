@@ -147,6 +147,13 @@ local Utility = {} do
             return self
         end
 
+        function draggable:isMouseInsideFrame()
+            local mouseloc = UserInputService:GetMouseLocation()
+            local ap, as = self.hostObject.AbsolutePosition, self.hostObject.AbsoluteSize
+            local tl, br = ap, ap + as
+            return (mouseloc.X >= tl.X and mouseloc.X <= br.X) and (mouseloc.Y >= br.Y and mouseloc.Y <= tl.Y)
+        end
+
         function draggable:start()
             if not self.started then
                 self.started = true
@@ -438,7 +445,7 @@ local function focusCommandInput()
     end))
 
     InlineMaid:GiveTask(textbox:GetPropertyChangedSignal("Text"):Connect(function()
-        local new_text = textbox.Text:gsub("[\t\r]", ""):gsub('`', '')
+        local new_text = textbox.Text:gsub("[\t]", ""):gsub('`', '')
         if new_text ~= "" then
             local context = string.split(new_text, " ")
             local foundPlugin = findPluginFromPrefix(context[1])
@@ -465,7 +472,7 @@ local function focusCommandInput()
                         end
                     end
                 end
-                
+
                 for i = 2, #context do
                     if i == 2 then
                         new_text = new_text .. wrapTextInColor(context[i], 0, 88, 255)
@@ -514,7 +521,7 @@ UIX.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gpe)
     if gpe then return end
     if inputObject.KeyCode == Enum.KeyCode.Backquote then
         toggleCommandPrompt()
-    elseif inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
+    elseif inputObject.UserInputType == Enum.UserInputType.MouseButton1 and not DraggableObject:isMouseInsideFrame() then
         if Flags.windowShown then
             toggleCommandPrompt()
         end
