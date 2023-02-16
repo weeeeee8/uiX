@@ -24,7 +24,7 @@ local ERROR_LOG_MARKER = GenericUtility:Symbol("ErrorLog")
 local WARNING_LOG_MARKER = GenericUtility:Symbol("WarningLog")
 local INFO_LOG_MARKER = GenericUtility:Symbol("InfoLog")
 local INVALID_CHARACTERS = {
-    '`', '(', ')', '<', '>'
+    '`' , '(', ')', '<', '>'
 }
 
 local InlineMaid = Maid.new()
@@ -154,7 +154,7 @@ local Utility = {} do
             local mouseloc = UserInputService:GetMouseLocation()
             local ap, as = self.hostObject.AbsolutePosition, self.hostObject.AbsoluteSize
             local tl, br = ap, ap + as
-            print((mouseloc.X > tl.X and mouseloc.X < br.X) and (mouseloc.Y > br.Y and mouseloc.Y < tl.Y))
+            print(mouseloc.X, tl.X, br.X, '|', mouseloc.Y, tl.Y, br.Y, '|', (mouseloc.X > tl.X and mouseloc.X < br.X) and (mouseloc.Y > br.Y and mouseloc.Y < tl.Y))
             return (mouseloc.X > tl.X and mouseloc.X < br.X) and (mouseloc.Y > br.Y and mouseloc.Y < tl.Y)
         end
 
