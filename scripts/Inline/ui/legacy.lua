@@ -93,7 +93,7 @@ end
 
 local function parseBarText(context: {string})
     local function wrapInColor(text, colorContext)
-        string.format('<font color="' .. BAR_CONTEXT_FONT_COLORS[colorContext] .. '">%s</font>', text)
+        return string.format('<font color="' .. BAR_CONTEXT_FONT_COLORS[colorContext] .. '">%s</font>', text)
     end
 
     local function toString(texts)
