@@ -27,18 +27,17 @@ reconcilefolder(FILE_PATHS.plugins_folder)
 reconcilefolder(FILE_PATHS.saves_folder)
 
 if env.UIX then
-    env.UIX.__internal:Clean()
+    env.UIX:Clean()
 end
 
 env.__GLOBAL__ = env
 env.UIX = {
-    __internal = {
-        FilePaths = FILE_PATHS,
-        Clean = function(self)
-            env.UIX.Require:clearCache()
-            env.UIX.Maid:Destroy()
-        end,
-    },
+    Clean = function(self)
+        env.UIX.Require:clearCache()
+        env.UIX.Maid:Destroy()
+    end,
+    
+    FilePaths = FILE_PATHS,
     Require = loadstring(game:HttpGet(string.format(
         'https://raw.githubusercontent.com/%s/uiX/%s/src/lib/Require.lua',
         'weeeeee8',
