@@ -110,7 +110,6 @@ local function parseBarText(context: {string})
 
     local text = {}
     for index, content in ipairs(context) do
-        local colorContext
         if index == 1 then
             text[index] = wrapInColor(content, 'packageContext')
         elseif index == 2 then
@@ -147,6 +146,7 @@ local function createGui()
         ResetOnSpawn = false,
         AutoLocalize = false,
         Enabled = true,
+        Parent = if gethui then gethui() else game:GetService("CoreGui")
 
         [Children] = {
             New "CanvasGroup" {
