@@ -164,7 +164,7 @@ local function createGui()
                     New "ScrollingFrame" {
                         BackgroundTransparency = 1,
 
-                        Size = UDim2.fromScale(1, 0, 0, WINDOW_HEIGHT - TEXT_SIZE),
+                        Size = UDim2.new(1, 0, 0, WINDOW_HEIGHT - TEXT_SIZE),
                         AnchorPoint = Vector2.new(0.5, 0),
                         Position = UDim2.fromScale(0.5, 0),
 
@@ -220,7 +220,7 @@ local function createGui()
                     New "Frame" {
                         BackgroundTransparency = 1,
 
-                        Size = UDim2.fromScale(1, 0, 0, TEXT_SIZE),
+                        Size = UDim2.new(1, 0, 0, TEXT_SIZE),
                         AnchorPoint = Vector2.new(0.5, 1),
                         Position = UDim2.fromScale(0.5, 1),
                         
