@@ -152,11 +152,11 @@ local function createGui()
             New "CanvasGroup" {
                 Name = "InlineConsoleWindow",
 
-                BackgroundTransparency = 0.8,
-                BackgroundColor3 = Color3.fromRGB(57, 57, 57),
+                BackgroundTransparency = 0.4,
+                BackgroundColor3 = Color3.fromRGB(17, 17, 17),
                 BorderSizePixel = 0,
                 Position = UDim2.new(0.5, 0, 0, 25),
-                Size = UDim2.new(0.5, 0, 0, 50),
+                Size = UDim2.new(0, 200, 0, 50),
                 AnchorPoint = Vector2.new(0.5, 0),
 
                 Visible = Computed(function()
@@ -169,8 +169,6 @@ local function createGui()
                 [Children] = {
                     createUIPadding(3, 3),
                     New "ScrollingFrame" {
-                        BackgroundColor3 = Color3.fromRGB(61, 61, 61),
-                        BorderSizePixel = 0,
                         BackgroundTransparency = 1,
 
                         Size = UDim2.fromScale(1, 0.8225),
@@ -227,10 +225,6 @@ local function createGui()
                         }
                     },
                     New "Frame" {
-                        BackgroundColor3 = Color3.fromRGB(61, 61, 61),
-                        BorderSizePixel = 0,
-                        BackgroundTransparency = 0.5,
-
                         Size = UDim2.fromScale(1, 0.25),
                         AnchorPoint = Vector2.new(0.5, 1),
                         Position = UDim2.fromScale(0.5, 1),
@@ -266,6 +260,7 @@ local function createGui()
                                 BackgroundTransparency = 1,
                                 Text = "",
 
+                                RichText = true,
                                 TextSize = TEXT_SIZE,
                                 TextColor3 = Color3.fromRGB(235, 235, 235),
 
@@ -285,7 +280,7 @@ local function focusBar(window)
 
     local function focus()
         inputFocus.Text = ""
-        inputDisplay.Text = ""
+        inputDisplay.Text = '<font color="rgb(162, 161, 161)">start typing to call a command</font>'
 
         task.delay(0.1, inputFocus.CaptureFocus, inputFocus)
     end
