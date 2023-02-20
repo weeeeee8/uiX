@@ -152,10 +152,11 @@ local function createGui()
             New "CanvasGroup" {
                 Name = "InlineConsoleWindow",
 
-                BackgroundColor3 = Color3.fromRGB(23, 23, 23),
+                BackgroundTransparency = 0.8,
+                BackgroundColor3 = Color3.fromRGB(57, 57, 57),
                 BorderSizePixel = 0,
                 Position = UDim2.new(0.5, 0, 0, 25),
-                Size = UDim2.new(0.95, 0, 0, 100),
+                Size = UDim2.new(0.5, 0, 0, 50),
                 AnchorPoint = Vector2.new(0.5, 0),
 
                 Visible = Computed(function()
@@ -168,8 +169,9 @@ local function createGui()
                 [Children] = {
                     createUIPadding(3, 3),
                     New "ScrollingFrame" {
-                        BackgroundColor3 = Color3.fromRGB(16, 16, 16),
+                        BackgroundColor3 = Color3.fromRGB(61, 61, 61),
                         BorderSizePixel = 0,
+                        BackgroundTransparency = 1,
 
                         Size = UDim2.fromScale(1, 0.8225),
                         AnchorPoint = Vector2.new(0.5, 0),
@@ -225,10 +227,11 @@ local function createGui()
                         }
                     },
                     New "Frame" {
-                        BackgroundColor3 = Color3.fromRGB(16, 16, 16),
+                        BackgroundColor3 = Color3.fromRGB(61, 61, 61),
                         BorderSizePixel = 0,
+                        BackgroundTransparency = 0.5,
 
-                        Size = UDim2.fromScale(1, 0.1225),
+                        Size = UDim2.fromScale(1, 0.25),
                         AnchorPoint = Vector2.new(0.5, 1),
                         Position = UDim2.fromScale(0.5, 1),
                         
