@@ -46,6 +46,10 @@ local function fusionInstanceWrapper(instance)
     function wrapper:get()
         return instance
     end
+    function wrapper:onPropChanged(prop, fn)
+        table.insert(self.connections, instance:GetPropertyChangedSignal(prop):Connect(fn))
+        return self
+    end
     function wrapper:connectSignal(signalName, fn)
         table.insert(self.connections, instance[signalName]:Connect(fn))
         return self
@@ -266,7 +270,8 @@ local function createGui()
 end
 
 local function focusBar(window)
-    local inputDisplay, inputFocus = window:findChild("InputDisplay"), window:findChild("InputFocus")
+    local wrappedDisplay, wrappedFocus = window:findChild("InputDisplay"), window:findChild("InputFocus")
+    local inputDisplay, inputFocus = wrappedDisplay:get(), wrappedFocus:get()
 
     local function focus()
         inputFocus.Text = ""
@@ -275,16 +280,16 @@ local function focusBar(window)
         task.delay(0.1, inputFocus.CaptureFocus, inputFocus)
     end
     
-    LifecycleMaid:GiveTask(inputFocus:get():GetPropertyChangedSignal("Text"):Connect(function()
-        local input = inputFocus:get().Text
+    wrappedFocus:onPropChanged("Text", function()
+        local input = inputFocus.Text
         local context = string.split(input, " ")
         local text = parseBarText(context)
-        inputDisplay:get().Text = text
-    end))
+        inputDisplay.Text = text
+    end)
 
     LifecycleMaid:GiveTask(function()
-        inputDisplay:DisconnectAll()
-        inputFocus:DisconnectAll()
+        wrappedFocus:DisconnectAll()
+        wrappedDisplay:DisconnectAll()
     end)
     
     focus()
