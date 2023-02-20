@@ -284,8 +284,6 @@ local function focusBar(window)
         local input = inputFocus.Text
         local context = string.split(input, " ")
         local text = parseBarText(context)
-        print(input, text)
-        warn(unpack(context))
         inputDisplay.Text = text
     end)
 
