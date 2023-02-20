@@ -42,7 +42,9 @@ local Tweens = {
 }
 
 local function fusionInstanceWrapper(instance)
-    local wrapper = setmetatable({}, {__index = instance})
+    local wrapped = setmetatable({}, {__index = instance})
+    local wrapper = {}
+    wrapper.__index = wrapped
     wrapper.connections = {}
     wrapper[Children] = {}
     function wrapper:get()
@@ -69,9 +71,7 @@ local function fusionInstanceWrapper(instance)
         setmetatable(self, nil)
     end
     setmetatable(wrapper, {
-        __index = function(s, k)
-            return rawget(s, k) or instance[k]
-        end,
+        __index = wrapped,
         __newindex = function(s, k, v)
             if not((select(2, pcall(function() local _=instance[k] end)) or ""):find("is not a valid member of")) then
                 instance[k] = v
