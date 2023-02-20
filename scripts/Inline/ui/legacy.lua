@@ -116,6 +116,8 @@ local function parseBarText(context: {string})
         end
     end
 
+    print(unpack(text))
+
     return toString(text), context
 end
 
