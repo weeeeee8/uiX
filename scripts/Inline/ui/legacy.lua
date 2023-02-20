@@ -44,7 +44,6 @@ local Tweens = {
 local function fusionInstanceWrapper(instance)
     local wrapped = setmetatable({}, {__index = instance})
     local wrapper = {}
-    wrapper.__index = wrapped
     wrapper.connections = {}
     wrapper[Children] = {}
     function wrapper:get()
