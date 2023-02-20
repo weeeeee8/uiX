@@ -172,7 +172,7 @@ local function createGui()
                         CanvasSize = UDim2.fromScale(0, 0),
                         AutomaticCanvasSize = Enum.AutomaticSize.Y,
                         CanvasPosition = Computed(function()
-                            return States.canvasHeightPosition:get()
+                            return Vector2.new(0, States.canvasHeightPosition:get())
                         end),
 
                         [Children] = {
