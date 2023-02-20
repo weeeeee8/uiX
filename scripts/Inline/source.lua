@@ -33,3 +33,5 @@ UIX.Maid:GiveTask(function()
     UIX.Inline.Maid:Destroy()
     table.clear(UIX.Inline)
 end)
+
+extendedRequire:import("/ui/legacy.lua")
