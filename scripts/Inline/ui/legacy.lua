@@ -155,9 +155,9 @@ local function createGui()
                 BackgroundTransparency = 0.4,
                 BackgroundColor3 = Color3.fromRGB(17, 17, 17),
                 BorderSizePixel = 0,
-                Position = UDim2.new(0.5, 0, 0, 25),
+                Position = UDim2.new(0.5, 0, 0.5, 0),
                 Size = UDim2.new(0, 200, 0, 50),
-                AnchorPoint = Vector2.new(0.5, 0),
+                AnchorPoint = Vector2.new(0.5, 0.5),
 
                 Visible = Computed(function()
                     return if Tweens.transparency:get() >= 1 then false else true
