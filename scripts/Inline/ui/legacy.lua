@@ -25,8 +25,6 @@ local BAR_CONTEXT_FONT_COLORS = {
     logicContext = '57, 159, 238', -- true or false
 }
 
-Color3.fromRGB(57, 159, 238)
-
 local New, Children, State, ComputedPairs, Computed = Fusion.New, Fusion.Children, Fusion.State, Fusion.ComputedPairs, Fusion.Computed
 
 local LifecycleMaid = Maid.new()
@@ -42,7 +40,6 @@ local Tweens = {
 }
 
 local function fusionInstanceWrapper(instance)
-    local wrapped = setmetatable({}, {__index = instance})
     local wrapper = {}
     wrapper.connections = {}
     wrapper[Children] = {}
@@ -162,7 +159,7 @@ local function createGui()
                 AnchorPoint = Vector2.new(0.5, 0),
 
                 Visible = Computed(function()
-                    return if Tweens.transparency:get() >= 1 then false else true
+                    return if States.transparency:get() >= 1 then false else true
                 end),
                 GroupTransparency = Computed(function()
                     return Tweens.transparency:get()
