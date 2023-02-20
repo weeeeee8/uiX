@@ -146,7 +146,7 @@ local function createGui()
         ResetOnSpawn = false,
         AutoLocalize = false,
         Enabled = true,
-        Parent = if gethui then gethui() else game:GetService("CoreGui")
+        Parent = if gethui then gethui() else game:GetService("CoreGui"),
 
         [Children] = {
             New "CanvasGroup" {
