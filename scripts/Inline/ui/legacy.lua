@@ -70,7 +70,19 @@ local function fusionInstanceWrapper(instance)
         setmetatable(self, nil)
     end
     setmetatable(wrapper, {
-        __index = wrapped,
+        __index = function(s, k)
+            if not((select(2, pcall(function() local _=instance[k] end)) or ""):find("is not a valid member of")) then
+                if type(instance[k]) == "function" then
+                    return function(...)
+                        return instance[k](instance, ...)
+                    end
+                else
+                    return instance[k]
+                end
+            else
+                return rawget(s, k)
+            end
+        end,
         __newindex = function(s, k, v)
             if not((select(2, pcall(function() local _=instance[k] end)) or ""):find("is not a valid member of")) then
                 instance[k] = v
