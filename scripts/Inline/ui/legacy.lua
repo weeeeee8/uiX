@@ -67,19 +67,7 @@ local function fusionInstanceWrapper(instance)
         setmetatable(self, nil)
     end
     setmetatable(wrapper, {
-        __index = function(s, k)
-            if not((select(2, pcall(function() local _=instance[k] end)) or ""):find("is not a valid member of")) then
-                if type(instance[k]) == "function" then
-                    return function(_, ...)
-                        return instance[k](instance, ...)
-                    end
-                else
-                    return instance[k]
-                end
-            else
-                return rawget(s, k)
-            end
-        end,
+        __index = instance,
         __newindex = function(s, k, v)
             if not((select(2, pcall(function() local _=instance[k] end)) or ""):find("is not a valid member of")) then
                 instance[k] = v
@@ -287,12 +275,11 @@ local function focusBar(window)
         task.delay(0.1, inputFocus.CaptureFocus, inputFocus)
     end
     
-    LifecycleMaid:GiveTask(inputFocus:GetPropertyChangedSignal("Text"):Connect(function()
-        local input = inputFocus.Text
+    LifecycleMaid:GiveTask(inputFocus:get():GetPropertyChangedSignal("Text"):Connect(function()
+        local input = inputFocus:get().Text
         local context = string.split(input, " ")
         local text = parseBarText(context)
-        print(text)
-        inputDisplay.Text = text
+        inputDisplay:get().Text = text
     end))
 
     LifecycleMaid:GiveTask(function()
