@@ -290,7 +290,9 @@ local function focusBar(window)
     LifecycleMaid:GiveTask(inputFocus:GetPropertyChangedSignal("Text"):Connect(function()
         local input = inputFocus.Text
         local context = string.split(input, " ")
-        inputDisplay.Text = parseBarText(context)
+        local text = parseBarText(context)
+        print(text)
+        inputDisplay.Text = text
     end))
 
     LifecycleMaid:GiveTask(function()
@@ -320,6 +322,7 @@ end
 local Window = fusionInstanceWrapper(createGui())
 Inline.Maid:GiveTask(function()
     Window:Destroy()
+    LifecycleMaid:DoCleaning()
 end)
 
 Inline.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gameProcessedEvent)
