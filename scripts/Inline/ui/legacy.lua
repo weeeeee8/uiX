@@ -7,6 +7,7 @@ local GenericUtility = UIX.Require:get('GenericUtility')
 local Inline = UIX.Inline
 
 local TEXT_SIZE = 16
+local WINDOW_HEIGHT = 200
 local LOG_MARKERS = {
     error = GenericUtility:Symbol('LogError'),
     warning = GenericUtility:Symbol('LogWarning'),
@@ -116,7 +117,7 @@ local function parseBarText(context: {string})
         end
     end
 
-    print(unpack(text))
+    print(unpack(text), table.concat(text, " "))
 
     return toString(text), context
 end
@@ -139,7 +140,7 @@ local function createGui()
         Name = "Inline",
         ResetOnSpawn = false,
         AutoLocalize = false,
-        Enabled = true,
+        Enabled = if Tweens.transparency:get() >= 1 then false else true,
         Parent = if gethui then gethui() else game:GetService("CoreGui"),
 
         [Children] = {
@@ -150,12 +151,9 @@ local function createGui()
                 BackgroundColor3 = Color3.fromRGB(17, 17, 17),
                 BorderSizePixel = 0,
                 Position = UDim2.new(0.5, 0, 0.5, 0),
-                Size = UDim2.new(0, 500, 0, 200),
+                Size = UDim2.new(0, 500, 0, WINDOW_HEIGHT),
                 AnchorPoint = Vector2.new(0.5, 0.5),
 
-                Visible = Computed(function()
-                    return if Tweens.transparency:get() >= 1 then false else true
-                end),
                 GroupTransparency = Computed(function()
                     return Tweens.transparency:get()
                 end),
@@ -165,7 +163,7 @@ local function createGui()
                     New "ScrollingFrame" {
                         BackgroundTransparency = 1,
 
-                        Size = UDim2.fromScale(1, 0.8225),
+                        Size = UDim2.fromScale(1, 0, 0, WINDOW_HEIGHT - TEXT_SIZE),
                         AnchorPoint = Vector2.new(0.5, 0),
                         Position = UDim2.fromScale(0.5, 0),
 
@@ -221,7 +219,7 @@ local function createGui()
                     New "Frame" {
                         BackgroundTransparency = 1,
 
-                        Size = UDim2.fromScale(1, 0.25),
+                        Size = UDim2.fromScale(1, 0, 0, TEXT_SIZE),
                         AnchorPoint = Vector2.new(0.5, 1),
                         Position = UDim2.fromScale(0.5, 1),
                         
