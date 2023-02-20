@@ -160,7 +160,7 @@ local function createGui()
                 AnchorPoint = Vector2.new(0.5, 0),
 
                 Visible = Computed(function()
-                    return if States.transparency:get() >= 1 then false else true
+                    return if Tweens.transparency:get() >= 1 then false else true
                 end),
                 GroupTransparency = Computed(function()
                     return Tweens.transparency:get()
