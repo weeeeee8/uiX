@@ -73,7 +73,7 @@ local function fusionInstanceWrapper(instance)
         __index = function(s, k)
             if not((select(2, pcall(function() local _=instance[k] end)) or ""):find("is not a valid member of")) then
                 if type(instance[k]) == "function" then
-                    return function(...)
+                    return function(_, ...)
                         return instance[k](instance, ...)
                     end
                 else
