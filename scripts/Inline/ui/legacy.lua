@@ -149,6 +149,7 @@ local function createGui()
         Name = "Inline",
         ResetOnSpawn = false,
         AutoLocalize = false,
+        Enabled = true,
 
         [Children] = {
             New "CanvasGroup" {
