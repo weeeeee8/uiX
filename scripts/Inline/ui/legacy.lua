@@ -156,7 +156,7 @@ local function createGui()
                 BackgroundColor3 = Color3.fromRGB(17, 17, 17),
                 BorderSizePixel = 0,
                 Position = UDim2.new(0.5, 0, 0.5, 0),
-                Size = UDim2.new(0, 200, 0, 50),
+                Size = UDim2.new(0, 500, 0, 200),
                 AnchorPoint = Vector2.new(0.5, 0.5),
 
                 Visible = Computed(function()
@@ -225,6 +225,8 @@ local function createGui()
                         }
                     },
                     New "Frame" {
+                        BackgroundTransparency = 1,
+
                         Size = UDim2.fromScale(1, 0.25),
                         AnchorPoint = Vector2.new(0.5, 1),
                         Position = UDim2.fromScale(0.5, 1),
