@@ -227,7 +227,7 @@ local function createGui()
                             New "TextBox" {
                                 Name = "InputFocus",
 
-                                ClearTextOnFocus = false,
+                                ClearTextOnFocus = true,
                                 MultiLine = false,
 
                                 TextSize = TEXT_SIZE,
@@ -281,9 +281,11 @@ local function focusBar(window)
     end
     
     wrappedFocus:onPropChanged("Text", function()
+        print(1)
         local input = inputFocus.Text
         local context = string.split(input, " ")
         local text = parseBarText(context)
+        print(text)
         inputDisplay.Text = text
     end)
 
