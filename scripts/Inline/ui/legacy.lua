@@ -281,11 +281,11 @@ local function focusBar(window)
     end
     
     wrappedFocus:onPropChanged("Text", function()
-        print(1)
         local input = inputFocus.Text
         local context = string.split(input, " ")
         local text = parseBarText(context)
-        print(text)
+        print(input, text)
+        warn(unpack(context))
         inputDisplay.Text = text
     end)
 
