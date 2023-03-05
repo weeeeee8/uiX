@@ -117,8 +117,6 @@ local function parseBarText(context: {string})
         end
     end
 
-    print(unpack(text), table.concat(text, " "))
-
     return toString(text), context
 end
 
@@ -150,9 +148,9 @@ local function createGui()
                 BackgroundTransparency = 0.4,
                 BackgroundColor3 = Color3.fromRGB(17, 17, 17),
                 BorderSizePixel = 0,
-                Position = UDim2.new(0.5, 0, 0.5, 0),
+                Position = UDim2.new(0.5, 0, 0, 50),
                 Size = UDim2.new(0, 500, 0, WINDOW_HEIGHT),
-                AnchorPoint = Vector2.new(0.5, 0.5),
+                AnchorPoint = Vector2.new(0.5, 0),
 
                 Visible = if Tweens.transparency:get() >= 1 then false else true,
                 GroupTransparency = Computed(function()
@@ -321,7 +319,7 @@ end)
 Inline.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, gameProcessedEvent)
     if gameProcessedEvent then return end
     if inputObject.UserInputType == Enum.UserInputType.Keyboard then
-        if inputObject.KeyCode == Enum.KeyCode.Backquote then
+        if inputObject.KeyCode == Enum.KeyCode.F1 then
             toggle(Window)
         end
     end
