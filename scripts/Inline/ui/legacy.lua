@@ -154,6 +154,7 @@ local function createGui()
 
                 Visible = if Tweens.transparency:get() >= 1 then false else true,
                 GroupTransparency = Computed(function()
+                    print(Tweens.transparency:get())
                     return Tweens.transparency:get()
                 end),
 
