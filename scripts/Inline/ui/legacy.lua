@@ -152,9 +152,7 @@ local function createGui()
                 Size = UDim2.new(0, 500, 0, WINDOW_HEIGHT),
                 AnchorPoint = Vector2.new(0.5, 0),
 
-                Visible = if Tweens.transparency:get() >= 1 then false else true,
                 GroupTransparency = Computed(function()
-                    print(Tweens.transparency:get())
                     return Tweens.transparency:get()
                 end),
 
