@@ -35,6 +35,7 @@ local States = {
     suggestionsShown = State(false),
     canvasHeightPosition = State(0),
     toggled = State(false),
+    displaySet = State({})
 }
 local Tweens = {
     transparency = Fusion.Spring(States.transparency, 20, 0.98)
@@ -152,6 +153,9 @@ local function createGui()
                 Size = UDim2.new(0, 500, 0, WINDOW_HEIGHT),
                 AnchorPoint = Vector2.new(0.5, 0),
 
+                Visible = Computed(function()
+                    return if Tweens.transparency:get() == 1 then false else true
+                end),
                 GroupTransparency = Computed(function()
                     return Tweens.transparency:get()
                 end),
@@ -242,6 +246,18 @@ local function createGui()
                                 TextYAlignment = Enum.TextYAlignment.Center,
                                 Selectable = false,
                             },
+
+                            New "Frame" {
+                                Size = UDim2.fromScale(1, 1),
+                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                Position = UDim2.fromScale(0.5, 0.5),
+                            }
+                            
+                            ComputedPairs(States.displaySet, function(displayData)
+                                return New "TextLabel" {
+                                    Name = "Set"
+                                }
+                            end),
                             New "TextLabel" {
                                 Name = "InputDisplay",
                                 
