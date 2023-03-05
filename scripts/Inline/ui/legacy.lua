@@ -103,6 +103,7 @@ local function parseBarText(context: {string})
 
     local text = {}
     for index, content in ipairs(context) do
+        print(index, content)
         if index == 1 then
             text[index] = wrapInColor(content, 'packageContext')
         elseif index == 2 then
@@ -283,6 +284,7 @@ local function focusBar(window)
         local context = string.split(input, " ")
         local text = parseBarText(context)
         inputDisplay.Text = text
+        print(inputDisplay.Text)
     end)
 
     LifecycleMaid:GiveTask(function()
