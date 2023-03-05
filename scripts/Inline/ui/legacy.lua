@@ -98,27 +98,26 @@ local function parseBarText(context: {string})
     end
 
     local function toString(texts)
-        return table.concat(texts, " ")
+        return table.concat(texts, " ", 1, #texts)
     end
 
-    local text = {}
+    local texts = {}
     for index, content in ipairs(context) do
-        print(index, content)
         if index == 1 then
-            text[index] = wrapInColor(content, 'packageContext')
+            texts[index] = wrapInColor(content, 'packageContext')
         elseif index == 2 then
-            text[index] = wrapInColor(content, 'commandContext')
+            texts[index] = wrapInColor(content, 'commandContext')
         else
             local isLogic = type(select(1, pcall(HttpService.JSONDecode, HttpService, content))) == "boolean"
             if content:sub(-1, 1) == "@" then
-                text[index] = wrapInColor(content, 'statementContext')
+                texts[index] = wrapInColor(content, 'statementContext')
             elseif isLogic then
-                text[index] = wrapInColor(content, 'logicContext')
+                texts[index] = wrapInColor(content, 'logicContext')
             end
         end
     end
 
-    return toString(text), context
+    return toString(texts), context
 end
 
 local function createUIPadding(a, b, c, d)
@@ -233,9 +232,9 @@ local function createGui()
                                 TextTransparency = 1,
                                 Text = "",
 
-                                Size = UDim2.new(1, 1),
-                                AnchorPoint = Vector2.new(0.5, 1),
-                                Position = UDim2.fromScale(0.5, 1),
+                                Size = UDim2.fromScale(1, 1),
+                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                Position = UDim2.fromScale(0.5, 0.5),
                                 
                                 BackgroundTransparency = 1,
 
@@ -246,9 +245,9 @@ local function createGui()
                             New "TextLabel" {
                                 Name = "InputDisplay",
                                 
-                                Size = UDim2.new(1, 1),
-                                AnchorPoint = Vector2.new(0.5, 1),
-                                Position = UDim2.fromScale(0.5, 1),
+                                Size = UDim2.fromScale(1, 1),
+                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                Position = UDim2.fromScale(0.5, 0.5),
 
                                 BackgroundTransparency = 1,
                                 Text = "",
