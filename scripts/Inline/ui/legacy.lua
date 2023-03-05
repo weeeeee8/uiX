@@ -140,7 +140,7 @@ local function createGui()
         Name = "Inline",
         ResetOnSpawn = false,
         AutoLocalize = false,
-        Enabled = if Tweens.transparency:get() >= 1 then false else true,
+        Enabled = true,
         Parent = if gethui then gethui() else game:GetService("CoreGui"),
 
         [Children] = {
@@ -154,7 +154,7 @@ local function createGui()
                 Size = UDim2.new(0, 500, 0, WINDOW_HEIGHT),
                 AnchorPoint = Vector2.new(0.5, 0.5),
 
-                Visible = true,
+                Visible = if Tweens.transparency:get() >= 1 then false else true,
                 GroupTransparency = Computed(function()
                     return Tweens.transparency:get()
                 end),
