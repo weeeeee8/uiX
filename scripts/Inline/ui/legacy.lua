@@ -283,7 +283,6 @@ local function focusBar(window)
         local context = string.split(input, " ")
         local text = parseBarText(context)
         inputDisplay.Text = text
-        print(inputDisplay.Text)
     end)
 
     LifecycleMaid:GiveTask(function()
