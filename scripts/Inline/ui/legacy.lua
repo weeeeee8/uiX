@@ -18,12 +18,13 @@ local LOG_CONTEXT_FONT_COLORS = {
     [LOG_MARKERS.warning] = 'rgb(245, 165, 5)',
     [LOG_MARKERS.info] = 'rgb(0, 34, 255)',
 }
-local BAR_CONTEXT_FONT_COLORS = {
-    packageContext = 'rgb(236, 55, 0)',
-    commandContext = 'rgb(0, 55, 255)',
-    statementContext = 'rgb(238, 220, 57)', -- a string with the "@" character, only accepts number comparisons
+local BAR_CONTEXT_COLORS = {
+    packageContext = Color3.fromRGB(229, 139, 69),
+    commandContext = Color3.fromRGB(116, 149, 242),
+    conditionContext = Color3.fromRGB(250, 242, 100), -- a string with the "@" character, only accepts number comparisons
     -- example, we want to make a loopbring and only bring those whose health is greater than 0. so we input: somePackage loopbring all @>0
-    logicContext = '57, 159, 238', -- true or false
+    logicContext = Color3.fromRGB(229, 69, 114), -- true or false
+    argumentContext = Color3.fromRGB(235, 235, 235)
 }
 
 local New, Children, State, ComputedPairs, Computed = Fusion.New, Fusion.Children, Fusion.State, Fusion.ComputedPairs, Fusion.Computed
@@ -94,31 +95,20 @@ local function parseLineText(logtype, content: string)
 end
 
 local function parseBarText(context: {string})
-    local function wrapInColor(text, colorContext)
-        return string.format('<font color="' .. BAR_CONTEXT_FONT_COLORS[colorContext] .. '">%s</font>', text)
+    local newSet = States.displaySet:get()
+    for index, text in ipairs(context) do
+        local color = if index == 1 then BAR_CONTEXT_COLORS.packageContext
+            elseif index == 2 then BAR_CONTEXT_COLORS.commandContext
+            elseif text:sub(-1, 1) == "@" then BAR_CONTEXT_COLORS.conditionContext
+            elseif type(select(2, pcall(HttpService.JSONDecode, HttpService, text))) == "boolean" then BAR_CONTEXT_COLORS.logicContext
+            else BAR_CONTEXT_COLORS.argumentContext
+        
+        newSet[index] = {
+            Message = text,
+            Color = color,
+        }
     end
-
-    local function toString(texts)
-        return table.concat(texts, " ", 1, #texts)
-    end
-
-    local texts = {}
-    for index, content in ipairs(context) do
-        if index == 1 then
-            texts[index] = wrapInColor(content, 'packageContext')
-        elseif index == 2 then
-            texts[index] = wrapInColor(content, 'commandContext')
-        else
-            local isLogic = type(select(1, pcall(HttpService.JSONDecode, HttpService, content))) == "boolean"
-            if content:sub(-1, 1) == "@" then
-                texts[index] = wrapInColor(content, 'statementContext')
-            elseif isLogic then
-                texts[index] = wrapInColor(content, 'logicContext')
-            end
-        end
-    end
-
-    return toString(texts), context
+    States.displaySet:set(newSet, true)
 end
 
 local function createUIPadding(a, b, c, d)
@@ -161,7 +151,7 @@ local function createGui()
                 end),
 
                 [Children] = {
-                    createUIPadding(3, 3),
+                    createUIPadding(5, 5),
                     New "ScrollingFrame" {
                         BackgroundTransparency = 1,
 
@@ -219,7 +209,8 @@ local function createGui()
                         }
                     },
                     New "Frame" {
-                        BackgroundTransparency = 1,
+                        BackgroundTransparency = 0.8,
+                        BackgroundColor3 = Color3.fromRGB(10, 10, 10),
 
                         Size = UDim2.new(1, 0, 0, TEXT_SIZE),
                         AnchorPoint = Vector2.new(0.5, 1),
@@ -251,30 +242,37 @@ local function createGui()
                                 Size = UDim2.fromScale(1, 1),
                                 AnchorPoint = Vector2.new(0.5, 0.5),
                                 Position = UDim2.fromScale(0.5, 0.5),
-                            }
-                            
-                            ComputedPairs(States.displaySet, function(displayData)
-                                return New "TextLabel" {
-                                    Name = "Set"
-                                }
-                            end),
-                            New "TextLabel" {
-                                Name = "InputDisplay",
-                                
-                                Size = UDim2.fromScale(1, 1),
-                                AnchorPoint = Vector2.new(0.5, 0.5),
-                                Position = UDim2.fromScale(0.5, 0.5),
-
                                 BackgroundTransparency = 1,
-                                Text = "",
+                                
+                                [Children] = {
+                                    New "UIListLayout" {
+                                        Padding = UDim.new(0, 1),
+                                        SortOrder = Enum.SortOrder.LayoutOrder,
+                                        FillDirection = Enum.FillDirection.Horizontal,
+                                        VerticalAlignment = Enum.VerticalAlignment.Center,
+                                        HorizontalAlignment = Enum.HorizontalAlignment.Left,
+                                    },
+                                    ComputedPairs(States.displaySet, function(displayData)
+                                        return New "TextLabel" {
+                                            Name = "Argument",
 
-                                RichText = true,
-                                TextSize = TEXT_SIZE,
-                                TextColor3 = Color3.fromRGB(235, 235, 235),
+                                            AutomaticSize = Enum.AutomaticSize.X,
+                                            Size = UDim2.fromScale(0, 1),
+                                            AnchorPoint = Vector2.new(0.5, 0.5),
 
-                                TextXAlignment = Enum.TextXAlignment.Left,
-                                TextYAlignment = Enum.TextYAlignment.Center,
-                            }
+                                            Text = displayData.Message,
+                                            TextColor3 = displayData.Color,
+                                            TextSize = TEXT_SIZE,
+
+                                            BackgroundTransparency = 1,
+                                            TextXAlignment = Enum.TextXAlignment.Left,
+                                            TextYAlignment = Enum.TextYAlignment.Center,
+                                        }
+                                    end, function(element)
+                                        element:Destroy()
+                                    end),
+                                }
+                            },
                         }
                     }
                 }
