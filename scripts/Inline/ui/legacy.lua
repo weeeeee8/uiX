@@ -227,7 +227,7 @@ local function createGui()
                                 TextTransparency = 1,
                                 Text = "",
 
-                                Size = UDim2.fromScale(1, 1),
+                                Size = UDim2.fromScale(0, 0),
                                 AnchorPoint = Vector2.new(0.5, 0.5),
                                 Position = UDim2.fromScale(0.5, 0.5),
                                 
@@ -244,7 +244,6 @@ local function createGui()
                                 Size = UDim2.fromScale(0, 1),
                                 AnchorPoint = Vector2.new(000, 0.5),
                                 
-
                                 Text = "",
                                 TextColor3 = Color3.fromRGB(168, 168, 168),
                                 TextSize = TEXT_SIZE,
