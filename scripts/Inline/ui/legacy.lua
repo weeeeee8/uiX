@@ -104,6 +104,7 @@ local function getComparisonContext(text)
             local realChar = content[i+1]
             if realChar then
                 if chars[realChar] then
+                    print(realChar, char)
                     comparisonContext = if char == ">" and realChar == "=" then "ge"
                         elseif char == "<" and realChar == "=" then "le"
                         elseif char == "!" and realChar == "=" then "ne"
@@ -112,6 +113,7 @@ local function getComparisonContext(text)
                     else nil
                 end
             else
+                print(char)
                 --check it based on the character
                 comparisonContext = if char == ">" then "gt"
                     elseif char == "<" then "lt"
@@ -124,6 +126,7 @@ local function getComparisonContext(text)
             continue
         end
     end
+    print(textWithoutParenthesis, comparisonContext)
     return comparisonContext
 end
 
