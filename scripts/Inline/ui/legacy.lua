@@ -237,7 +237,21 @@ local function createGui()
                                 TextYAlignment = Enum.TextYAlignment.Center,
                                 Selectable = false,
                             },
+                            New "TextLabel" {
+                                Name = "HintDisplay",
 
+                                AutomaticSize = Enum.AutomaticSize.X,
+                                Size = UDim2.fromScale(0, 1),
+                                AnchorPoint = Vector2.new(0.5, 0.5),
+
+                                Text = "",
+                                TextColor3 = Color3.fromRGB(168, 168, 168),
+                                TextSize = TEXT_SIZE,
+
+                                BackgroundTransparency = 1,
+                                TextXAlignment = Enum.TextXAlignment.Left,
+                                TextYAlignment = Enum.TextYAlignment.Center,
+                            },
                             New "Frame" {
                                 Size = UDim2.fromScale(1, 1),
                                 AnchorPoint = Vector2.new(0.5, 0.5),
@@ -282,12 +296,12 @@ local function createGui()
 end
 
 local function focusBar(window)
-    local wrappedDisplay, wrappedFocus = window:findChild("InputDisplay"), window:findChild("InputFocus")
-    local inputDisplay, inputFocus = wrappedDisplay:get(), wrappedFocus:get()
+    local wrappedDisplay, wrappedFocus = window:findChild("HintDisplay"), window:findChild("InputFocus")
+    local hintDisplay, inputFocus = wrappedDisplay:get(), wrappedFocus:get()
 
     local function focus()
         inputFocus.Text = ""
-        inputDisplay.Text = '<font color="rgb(162, 161, 161)">start typing to call a command</font>'
+        hintDisplay.Text = 'Start typing to invoke a command'
 
         task.delay(0.1, inputFocus.CaptureFocus, inputFocus)
     end
@@ -295,8 +309,8 @@ local function focusBar(window)
     wrappedFocus:onPropChanged("Text", function()
         local input = inputFocus.Text
         local context = string.split(input, " ")
-        local text = parseBarText(context)
-        inputDisplay.Text = text
+        parseBarText(context)
+        hintDisplay.Text = ""
     end)
 
     LifecycleMaid:GiveTask(function()
