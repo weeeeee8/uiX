@@ -151,7 +151,7 @@ local function createGui()
                 end),
 
                 [Children] = {
-                    createUIPadding(5, 5),
+                    createUIPadding(5, 5, 5, 5),
                     New "ScrollingFrame" {
                         BackgroundTransparency = 1,
 
@@ -239,10 +239,11 @@ local function createGui()
                             },
                             New "TextLabel" {
                                 Name = "HintDisplay",
-
+                                Position = UDim2.fromScale(0.5, 0.5),
                                 AutomaticSize = Enum.AutomaticSize.X,
                                 Size = UDim2.fromScale(0, 1),
                                 AnchorPoint = Vector2.new(0.5, 0.5),
+                                
 
                                 Text = "",
                                 TextColor3 = Color3.fromRGB(168, 168, 168),
