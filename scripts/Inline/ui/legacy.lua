@@ -102,31 +102,27 @@ local function getComparisonContext(text)
         local char = content[i]
         if chars[char] then
             local realChar = content[i+1]
-            if realChar then
+            if realChar ~= nil then
                 if chars[realChar] then
-                    print(realChar, char)
                     comparisonContext = if char == ">" and realChar == "=" then "ge"
                         elseif char == "<" and realChar == "=" then "le"
                         elseif char == "!" and realChar == "=" then "ne"
                         elseif char == "<" and realChar == "!" then "nl"
                         elseif char == ">" and realChar == "!" then "ng"
                     else nil
+                    break
                 end
-            else
-                print(char)
-                --check it based on the character
-                comparisonContext = if char == ">" then "gt"
-                    elseif char == "<" then "lt"
-                    elseif char == "!" then "n"
-                    elseif char == "=" then "e"
-                else nil
             end
+            --check it based on the character
+            comparisonContext = if char == ">" then "gt"
+                elseif char == "<" then "lt"
+                elseif char == "!" then "n"
+                elseif char == "=" then "e"
+            else nil
             break
-        else
-            continue
         end
     end
-    print(textWithoutParenthesis, comparisonContext)
+    print(textWithoutParenthesis, comparisonContext, table.concat(content, ','))
     return comparisonContext
 end
 
