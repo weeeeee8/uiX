@@ -242,7 +242,7 @@ local function createGui()
                                 Position = UDim2.fromScale(0.5, 0.5),
                                 AutomaticSize = Enum.AutomaticSize.X,
                                 Size = UDim2.fromScale(0, 1),
-                                AnchorPoint = Vector2.new(0.5, 0.5),
+                                AnchorPoint = Vector2.new(000, 0.5),
                                 
 
                                 Text = "",
@@ -255,8 +255,8 @@ local function createGui()
                             },
                             New "Frame" {
                                 Size = UDim2.fromScale(1, 1),
-                                AnchorPoint = Vector2.new(0.5, 0.5),
-                                Position = UDim2.fromScale(0.5, 0.5),
+                                AnchorPoint = Vector2.new(0, 0.5),
+                                Position = UDim2.fromScale(0, 0.5),
                                 BackgroundTransparency = 1,
                                 
                                 [Children] = {
@@ -267,7 +267,7 @@ local function createGui()
                                         VerticalAlignment = Enum.VerticalAlignment.Center,
                                         HorizontalAlignment = Enum.HorizontalAlignment.Left,
                                     },
-                                    ComputedPairs(States.displaySet, function(displayData)
+                                    ComputedPairs(States.displaySet, function(_, displayData)
                                         return New "TextLabel" {
                                             Name = "Argument",
 
@@ -317,6 +317,7 @@ local function focusBar(window)
     LifecycleMaid:GiveTask(function()
         wrappedFocus:DisconnectAll()
         wrappedDisplay:DisconnectAll()
+        States.displaySet:set({}, true)
     end)
     
     focus()
