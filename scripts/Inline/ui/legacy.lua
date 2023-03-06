@@ -42,6 +42,12 @@ local Tweens = {
     transparency = Fusion.Spring(States.transparency, 20, 0.98)
 }
 
+local function tryAutofill(text)
+    local autofillContext = {
+        
+    }
+end
+
 local function fusionInstanceWrapper(instance)
     local wrapper = {}
     wrapper.connections = {}
@@ -86,6 +92,41 @@ local function fusionInstanceWrapper(instance)
     return wrapper
 end
 
+local function getComparisonContext(text)
+    -- gt = greater than, lt = less than, n = not, e = equals to, ge = greater than or equals to, le = less than or equals to, ne = not equals to,
+    local textWithoutParenthesis = text:sub(2, #text-1)
+    local content = string.split(textWithoutParenthesis, '')
+    local chars = GenericUtility:Set('>','<','!','=')
+    local comparisonContext
+    for i = 1, #content do -- only expect 1-2 characters
+        local char = content[i]
+        if chars[char] then
+            local realChar = content[i+1]
+            if realChar then
+                if chars[realChar] then
+                    comparisonContext = if char == ">" and realChar == "=" then "ge"
+                        elseif char == "<" and realChar == "=" then "le"
+                        elseif char == "!" and realChar == "=" then "ne"
+                        elseif char == "<" and realChar == "!" then "nl"
+                        elseif char == ">" and realChar == "!" then "ng"
+                    else nil
+                end
+            else
+                --check it based on the character
+                comparisonContext = if char == ">" then "gt"
+                    elseif char == "<" then "lt"
+                    elseif char == "!" then "n"
+                    elseif char == "=" then "e"
+                else nil
+            end
+            break
+        else
+            continue
+        end
+    end
+    return comparisonContext
+end
+
 local function getLocalTimeNow()
     return DateTime.now():FormatLocalTime('LTS', 'en-us')
 end
@@ -99,7 +140,7 @@ local function parseBarText(context: {string})
     for index, text in ipairs(context) do
         local color = if index == 1 then BAR_CONTEXT_COLORS.packageContext
             elseif index == 2 then BAR_CONTEXT_COLORS.commandContext
-            elseif text:sub(1, 1) == "(" and text:sub(#text, #text) == ")" then BAR_CONTEXT_COLORS.conditionContext
+            elseif text:sub(1, 1) == "(" and text:sub(#text, #text) == ")" and getComparisonContext(text) ~= nil then BAR_CONTEXT_COLORS.conditionContext
             elseif type(select(2, pcall(HttpService.JSONDecode, HttpService, text))) == "boolean" then BAR_CONTEXT_COLORS.logicContext
             else BAR_CONTEXT_COLORS.argumentContext
         
