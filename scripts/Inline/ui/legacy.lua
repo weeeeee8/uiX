@@ -179,12 +179,11 @@ local function createGui()
                 BackgroundTransparency = 0.4,
                 BackgroundColor3 = Color3.fromRGB(17, 17, 17),
                 BorderSizePixel = 0,
-                Position = UDim2.new(0.5, 0, 0, 50),
                 Size = UDim2.new(0, 500, 0, WINDOW_HEIGHT),
                 AnchorPoint = Vector2.new(0.5, 0),
 
-                Visible = Computed(function()
-                    return if Tweens.transparency:get() == 1 then false else true
+                Position = Computed(function()
+                    return if Tweens.transparency:get() == 1 then UDim2.new(0.5, 0, 0, -WINDOW_HEIGHT) else UDim2.new(0.5, 0, 0, 50)
                 end),
                 GroupTransparency = Computed(function()
                     return Tweens.transparency:get()
