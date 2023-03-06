@@ -21,8 +21,8 @@ local LOG_CONTEXT_FONT_COLORS = {
 local BAR_CONTEXT_COLORS = {
     packageContext = Color3.fromRGB(229, 139, 69),
     commandContext = Color3.fromRGB(116, 149, 242),
-    conditionContext = Color3.fromRGB(250, 242, 100), -- a string with the "@" character, only accepts number comparisons
-    -- example, we want to make a loopbring and only bring those whose health is greater than 0. so we input: somePackage loopbring all @>0
+    conditionContext = Color3.fromRGB(250, 242, 100), -- a string where it is wrapped by Open "(" and Close ")" parenthesis, only accepts number comparisons
+    -- example, we want to make a loopbring and only bring those whose health is greater than 0. so we input: somePackage loopbring all (>0)
     logicContext = Color3.fromRGB(229, 69, 114), -- true or false
     argumentContext = Color3.fromRGB(235, 235, 235)
 }
@@ -99,7 +99,7 @@ local function parseBarText(context: {string})
     for index, text in ipairs(context) do
         local color = if index == 1 then BAR_CONTEXT_COLORS.packageContext
             elseif index == 2 then BAR_CONTEXT_COLORS.commandContext
-            elseif text:sub(-1, 1) == "@" then BAR_CONTEXT_COLORS.conditionContext
+            elseif text:sub(1, 1) == "(" and text:sub(#text, #text) == ")" then BAR_CONTEXT_COLORS.conditionContext
             elseif type(select(2, pcall(HttpService.JSONDecode, HttpService, text))) == "boolean" then BAR_CONTEXT_COLORS.logicContext
             else BAR_CONTEXT_COLORS.argumentContext
         
@@ -260,7 +260,7 @@ local function createGui()
                                 
                                 [Children] = {
                                     New "UIListLayout" {
-                                        Padding = UDim.new(0, 1),
+                                        Padding = UDim.new(0, 2),
                                         SortOrder = Enum.SortOrder.LayoutOrder,
                                         FillDirection = Enum.FillDirection.Horizontal,
                                         VerticalAlignment = Enum.VerticalAlignment.Center,
