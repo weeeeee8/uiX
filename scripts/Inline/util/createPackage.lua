@@ -15,6 +15,5 @@ return function(packageName: string)
     }, PackageAPI)
 
     table.insert(UIX.Inline.Packages, self)
-
     return self
 end
