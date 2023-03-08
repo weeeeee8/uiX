@@ -443,7 +443,7 @@ local function focusBar(window)
     end
 
     local function findSuggestedResult(tbl, match)
-        assert(#tbl > 0, "Table must be an array.")
+        if #tbl <= 0 then return nil, {} end
         local possibleSuggestions = {}
         for i = #tbl, 1, -1 do
             if tbl[i].Name:sub(1, #match) == match then
