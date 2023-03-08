@@ -14,7 +14,7 @@ return function(packageName: string)
         Commands = {},
     }, PackageAPI)
 
-    UIX.Inline.Packages[self] = true
+    table.insert(UIX.Inline.Packages, self)
 
     return self
 end
