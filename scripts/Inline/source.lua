@@ -29,6 +29,13 @@ UIX.Inline = {
 }
 
 function UIX.Inline:postPackage(package)
+    if type(package) == "string" then
+        package = extendedRequire:import('/packages' .. package)
+    end
+
+    if type(package) == "function" then
+        package = package()
+    end
     table.insert(self.Packages, package)
 end
 

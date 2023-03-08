@@ -168,7 +168,6 @@ return function()
             end)
         end))
     end)
-
     chatlogsCommand:createArguments(
         {
             "showLogs",
@@ -176,8 +175,9 @@ return function()
             true,
         }
     )
-
-    chatlogsCommand:setCallback(function()
-        
+    chatlogsCommand:setCallback(function(self, enabled)
+        self.UserData.Shown:set(enabled)
     end)
+
+    return package
 end

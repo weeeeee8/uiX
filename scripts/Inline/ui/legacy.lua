@@ -477,6 +477,7 @@ local function focusBar(window)
         States.showHint:set(newSet)
     end
     
+    
     wrappedFocus:onPropChanged("Text", function()
         local input = inputFocus.Text
         local context = string.split(input, " ")
@@ -520,6 +521,19 @@ local function focusBar(window)
             hintDisplay.Text = ""
         end
     end)
+
+    LifecycleMaid:GiveTask(inputFocus.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            local argumentsContext = {unpack(arguments, 3, #arguments)}
+            if activeCommand then
+                local success, err = pcall(function()
+                    activeCommand:execute(argumentsContext)
+                end)
+
+                print(success, err)
+            end
+        end
+    end))
 
     LifecycleMaid:GiveTask(EVENTS.InvokeAutoComplete:Connect(function()
         

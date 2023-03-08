@@ -45,7 +45,7 @@ function Command:execute(context: {string}) -- this is called on a pcall btw
         table.insert(realArgs, argument:assume(context[i]))
     end
     if self.Callback then
-        self.Callback(unpack(realArgs))
+        self.Callback(self, unpack(realArgs))
     else
         error(string.format(UIX.Inline.Messages.no_callback, self.Name))
     end
