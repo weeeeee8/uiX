@@ -28,6 +28,10 @@ UIX.Inline = {
     }
 }
 
+function UIX.Inline:postPackage(package)
+    table.insert(self.Packages, package)
+end
+
 UIX.Maid:GiveTask(function()
     UIX.Inline.Require:clearCache()
     UIX.Inline.Maid:Destroy()

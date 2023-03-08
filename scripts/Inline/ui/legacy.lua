@@ -34,7 +34,6 @@ local BAR_CONTEXT_COLORS = {
 local EVENTS = {
     InvokeAutoComplete = Signal.new()
 }
-local PACKAGES = {}
 
 local New, Children, State, ComputedPairs, Computed = Fusion.New, Fusion.Children, Fusion.State, Fusion.ComputedPairs, Fusion.Computed
 
@@ -485,7 +484,7 @@ local function focusBar(window)
 
         if #arguments == 1 then
             -- try getting the package
-            local foundSuggestedPackage, suggestions = findSuggestedResult(PACKAGES, arguments[1])
+            local foundSuggestedPackage, suggestions = findSuggestedResult(Inline.Packages, arguments[1])
             if foundSuggestedPackage then
                 activePackage = foundSuggestedPackage
             end
