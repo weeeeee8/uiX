@@ -10,16 +10,19 @@ local Argument = {}
 Argument.__index = Argument
 Argument.__metatable = {}
 
-function Argument.new(name, description, type, required)
+function Argument.new(name, type, required)
     local self = {}
     self.Name = name or "unknown argument"
-    self.Description = description or nil
     self.Type = type or "string"
     self.Required = required or false
     self._default = DEFAULTS[type]
 
     setmetatable(self, Argument)
     return self
+end
+
+function Argument:expects() -- use this, it must return an array of strings
+    return nil
 end
 
 function Argument:assume(str: string)

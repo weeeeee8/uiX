@@ -4,15 +4,20 @@ local UserInputService = game:GetService("UserInputService")
 local Maid = UIX.Require:get('Maid')
 local Fusion = UIX.Require:get('Fusion')
 local GenericUtility = UIX.Require:get('GenericUtility')
+local Signal = UIX.Require:get('Signal')
 local Inline = UIX.Inline
 
 local TEXT_SIZE = 16
 local WINDOW_HEIGHT = 200
+local SUGGESTION_PRIORITY_TYPE = "Ascending"
+
 local LOG_MARKERS = {
     error = GenericUtility:Symbol('LogError'),
     warning = GenericUtility:Symbol('LogWarning'),
     info = GenericUtility:Symbol('LogInfo'),
 }
+local SUGGESTION_HIGHLIGHT_COLOR_TOP = Color3.fromRGB(17, 172, 255)
+local SUGGESTION_HIGHLIGHT_COLOR_BOTTOM = Color3.fromRGB(133, 133, 133)
 local LOG_CONTEXT_FONT_COLORS = {
     [LOG_MARKERS.error] = 'rgb(245, 12, 0)',
     [LOG_MARKERS.warning] = 'rgb(245, 165, 5)',
@@ -26,6 +31,10 @@ local BAR_CONTEXT_COLORS = {
     logicContext = Color3.fromRGB(229, 69, 114), -- true or false
     argumentContext = Color3.fromRGB(235, 235, 235)
 }
+local EVENTS = {
+    InvokeAutoComplete = Signal.new()
+}
+local PACKAGES = {}
 
 local New, Children, State, ComputedPairs, Computed = Fusion.New, Fusion.Children, Fusion.State, Fusion.ComputedPairs, Fusion.Computed
 
@@ -36,17 +45,16 @@ local States = {
     suggestionsShown = State(false),
     canvasHeightPosition = State(0),
     toggled = State(false),
+    showHint = State({
+        Suggestions = State({}),
+        Visible = State(false),
+        Position = State(UDim2.fromScale(0, 0))
+    }),
     displaySet = State({})
 }
 local Tweens = {
     transparency = Fusion.Spring(States.transparency, 20, 0.98)
 }
-
-local function tryAutofill(text)
-    local autofillContext = {
-        
-    }
-end
 
 local function fusionInstanceWrapper(instance)
     local wrapper = {}
@@ -122,7 +130,7 @@ local function getComparisonContext(text)
             break
         end
     end
-    print(textWithoutParenthesis, comparisonContext, table.concat(content, ','))
+
     return comparisonContext
 end
 
@@ -149,6 +157,15 @@ local function parseBarText(context: {string})
         }
     end
     States.displaySet:set(newSet, true)
+
+    local function _pack(set)
+        local tbl = {}
+        for _, info in ipairs(set) do
+            table.insert(tbl, info.Message)
+        end
+        return tbl
+    end
+    return _pack(newSet)
 end
 
 local function createUIPadding(a, b, c, d)
@@ -198,7 +215,7 @@ local function createGui()
                         AnchorPoint = Vector2.new(0.5, 0),
                         Position = UDim2.fromScale(0.5, 0),
 
-                        ScrollBarImageColor3 = Color3.fromRGB(235, 235),
+                        ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255),
                         ScrollBarThickness = 5,
 
                         CanvasSize = UDim2.fromScale(0, 0),
@@ -292,6 +309,7 @@ local function createGui()
                                 TextYAlignment = Enum.TextYAlignment.Center,
                             },
                             New "Frame" {
+                                Name = "InputDisplayContent",
                                 Size = UDim2.fromScale(1, 1),
                                 AnchorPoint = Vector2.new(0, 0.5),
                                 Position = UDim2.fromScale(0, 0.5),
@@ -305,9 +323,9 @@ local function createGui()
                                         VerticalAlignment = Enum.VerticalAlignment.Center,
                                         HorizontalAlignment = Enum.HorizontalAlignment.Left,
                                     },
-                                    ComputedPairs(States.displaySet, function(_, displayData)
+                                    ComputedPairs(States.displaySet, function(i, displayData)
                                         return New "TextLabel" {
-                                            Name = "Argument",
+                                            Name = i,
 
                                             AutomaticSize = Enum.AutomaticSize.X,
                                             Size = UDim2.fromScale(0, 1),
@@ -329,14 +347,94 @@ local function createGui()
                         }
                     }
                 }
+            },
+            New "Frame" {
+                Name = "InlineSuggestionsWindow",
+
+                BackgroundTransparency = 0.4,
+                BackgroundColor3 = Color3.fromRGB(17, 17, 17),
+                BorderSizePixel = 0,
+
+                AutomaticSize = Enum.AutomaticSize.X,
+
+                Visible = Computed(function()
+                    return States.showHint:get().Visible:get()
+                end),
+                Size = UDim2.fromOffset(0, WINDOW_HEIGHT - 50),
+                Position = Computed(function()
+                    return States.showHint:get().Position:get()
+                end),
+
+                [Children] = {
+                    createUIPadding(3, 3, 3, 3),
+                    New "ScrollingFrame" {
+                        BackgroundTransparency = 1,
+
+                        Size = UDim2.fromScale(1, 1),
+                        AnchorPoint = Vector2.new(0.5, 0),
+                        Position = UDim2.fromScale(0.5, 0),
+
+                        ScrollBarImageColor3 = Color3.fromRGB(235, 235),
+                        ScrollBarThickness = 5,
+
+                        CanvasSize = UDim2.fromScale(0, 0),
+                        AutomaticCanvasSize = Enum.AutomaticSize.Y,
+                        CanvasPosition = Computed(function()
+                            return Vector2.new(0, States.canvasHeightPosition:get())
+                        end),
+
+                        [Children] = {
+                            createUIPadding(2, 2),
+                            New "UIListLayout" {
+                                Padding = UDim.new(0, 1),
+                                SortOrder = Enum.SortOrder.LayoutOrder,
+                                FillDirection = Enum.FillDirection.Vertical,
+                                VerticalAlignment = Enum.VerticalAlignment.Top,
+                            },
+                            ComputedPairs(States.showHint:get().Suggestions:get(), function(i, info)
+                                return New "Frame" {
+                                    Name = "SuggestionLine",
+
+                                    BackgroundTransparency = 1,
+                                    Size = UDim2.fromScale(1, 0),
+                                    AnchorPoint = Vector2.new(0.5, 0.5),
+                                    AutomaticSize = Enum.AutomaticSize.Y,
+                                    LayoutOrder = i,
+                                    
+                                    [Children] = {
+                                        New "TextLabel" {
+                                            Name = "SuggestionLabel",
+
+                                            BackgroundTransparency = 1,
+                                            Size = UDim2.fromScale(1, 0),
+                                            Position = UDim2.fromScale(0.5, 0.5),
+                                            AnchorPoint = Vector2.new(0.5, 0.5),
+
+                                            Text = info.suggestedResult,
+                                            TextSize = TEXT_SIZE,
+                                            TextColor3 = SUGGESTION_HIGHLIGHT_COLOR_BOTTOM:Lerp(SUGGESTION_HIGHLIGHT_COLOR_TOP, i / #States.showHint:get().Suggestions:get()),
+
+                                            TextXAlignment = Enum.TextXAlignment.Left,
+                                            TextYAlignment = Enum.TextYAlignment.Center,
+                                        }
+                                    }
+                                }
+                            end, function(element)
+                                element:Destroy()
+                            end)
+                        }
+                    },
+                }
             }
         }
     }
 end
 
 local function focusBar(window)
-    local wrappedDisplay, wrappedFocus = window:findChild("HintDisplay"), window:findChild("InputFocus")
-    local hintDisplay, inputFocus = wrappedDisplay:get(), wrappedFocus:get()
+    local wrappedDisplay, wrappedFocus, wrappedContentDisplay = window:findChild("HintDisplay"), window:findChild("InputFocus"), window:findChild("InputDisplayContent")
+    local hintDisplay, inputFocus, contentDisplay = wrappedDisplay:get(), wrappedFocus:get(), wrappedContentDisplay:get()
+    local arguments = {}
+    local activePackage, activeCommand
 
     local function focus()
         inputFocus.Text = ""
@@ -344,13 +442,89 @@ local function focusBar(window)
 
         task.delay(0.1, inputFocus.CaptureFocus, inputFocus)
     end
+
+    local function findSuggestedResult(tbl, match)
+        assert(#tbl > 0, "Table must be an array.")
+        local possibleSuggestions = {}
+        for i = #tbl, 1, -1 do
+            if tbl[i].Name:sub(1, #match) == match then
+                table.insert(possibleSuggestions, {
+                    suggestedResult = tbl[i].Name,
+                    len = #tbl[i].Name,
+                })
+            end
+        end
+        table.sort(possibleSuggestions, function(a, b)
+            if SUGGESTION_PRIORITY_TYPE == "Ascending" then
+                return a.len < b.len
+            elseif SUGGESTION_PRIORITY_TYPE == "Descending" then
+                return a.len > b.len
+            else
+                error("Invalid priority sorting type.")
+            end
+        end)
+        return if possibleSuggestions[1] then possibleSuggestions[1].suggestedResult else nil, possibleSuggestions
+    end
+
+    local function tryDisplayHint(suggestions)
+        local newSet = States.showHint:get()
+        if #suggestions > 0 then
+            newSet.Visible:set(false)
+            newSet.Suggestions:set(suggestions, true)
+            newSet.Position:set(UDim2.fromOffset(contentDisplay[tostring(#arguments)].AbsolutePosition.X, 50 + (WINDOW_HEIGHT - 50)))
+        else
+            newSet.Visible:set(false)
+        end
+        States.showHint:set(newSet)
+    end
     
     wrappedFocus:onPropChanged("Text", function()
         local input = inputFocus.Text
         local context = string.split(input, " ")
-        parseBarText(context)
-        hintDisplay.Text = ""
+        arguments = parseBarText(context)
+
+        if #arguments == 1 then
+            -- try getting the package
+            local foundSuggestedPackage, suggestions = findSuggestedResult(PACKAGES, arguments[1])
+            if foundSuggestedPackage then
+                activePackage = foundSuggestedPackage
+            end
+
+            tryDisplayHint(suggestions)
+        else
+            if #arguments > 2 then
+                if activeCommand then
+                    local foundArgument = activeCommand.Arguments[(#arguments + 1) - #arguments]
+                    if foundArgument then
+                        local expects = foundArgument:expects()
+                        if expects and #expects > 0 then
+                            tryDisplayHint(expects)
+                        end
+                    end
+                end
+            elseif #arguments == 2 then
+                -- try getting the command from the package
+                if activePackage then
+                    local foundSuggestedCommand, suggestions = findSuggestedResult(activePackage.Commands, arguments[2])
+                    if foundSuggestedCommand then
+                        activeCommand = foundSuggestedCommand
+                    end
+                    
+                    tryDisplayHint(suggestions)
+                end
+            end
+        end
+
+        tryDisplayHint()
+
+        if #hintDisplay.Text > 0 then
+            hintDisplay.Text = ""
+        end
     end)
+
+    LifecycleMaid:GiveTask(EVENTS.InvokeAutoComplete:Connect(function()
+        
+    end))
 
     LifecycleMaid:GiveTask(function()
         wrappedFocus:DisconnectAll()
@@ -388,6 +562,8 @@ Inline.Maid:GiveTask(UserInputService.InputBegan:Connect(function(inputObject, g
     if inputObject.UserInputType == Enum.UserInputType.Keyboard then
         if inputObject.KeyCode == Enum.KeyCode.F1 then
             toggle(Window)
+        elseif inputObject.KeyCode == Enum.KeyCode.Tab and States.toggled:get() then
+            EVENTS.InvokeAutoComplete:Fire()
         end
     end
 end))

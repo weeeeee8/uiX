@@ -34,4 +34,5 @@ UIX.Maid:GiveTask(function()
     table.clear(UIX.Inline)
 end)
 
+extendedRequire:import("/util/createPackage.lua")
 extendedRequire:import("/ui/legacy.lua")

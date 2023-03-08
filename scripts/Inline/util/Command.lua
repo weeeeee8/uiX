@@ -8,17 +8,34 @@ function Command.new(name)
     local self = setmetatable({
         Name = name,
 
+        Userdata = {},
         Arguments = {},
         Callback = nil,
     }, Command)
 
-    return self
+    return function(fn)
+        fn(self.Userdata)
+        return self
+    end
+end
+
+function Command:createArgument(argument)
+    local arg = Argument.new(argument[1], argument[2], argument[3])
+    table.insert(self.Arguments, arg)
+    if argument[4] then
+        arg:expects(argument[4])
+    end
+    return arg
 end
 
 function Command:createArguments(...)
     for argument in pairs(GenericUtility:Set(...)) do
-        table.insert(self.Arguments, Argument.new(argument[1], argument[3], argument[2]))
+        table.insert(self.Arguments, self:createArgument(argument))
     end
+end
+
+function Command:setCallback(callback)
+    self.Callback = callback
 end
 
 function Command:execute(context: {string}) -- this is called on a pcall btw
