@@ -467,7 +467,7 @@ local function focusBar(window)
 
     local function tryDisplayHint(suggestions)
         local newSet = States.showHint:get()
-        if #suggestions > 0 then
+        if suggestions and #suggestions > 0 then
             newSet.Visible:set(false)
             newSet.Suggestions:set(suggestions, true)
             newSet.Position:set(UDim2.fromOffset(contentDisplay[tostring(#arguments)].AbsolutePosition.X, 50 + (WINDOW_HEIGHT - 50)))
@@ -514,8 +514,6 @@ local function focusBar(window)
                 end
             end
         end
-
-        tryDisplayHint()
 
         if #hintDisplay.Text > 0 then
             hintDisplay.Text = ""
